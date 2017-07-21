@@ -72,6 +72,7 @@ func (src ImageRegexpSource) Get( frame uint) (image.Image, error ) {
 type Config struct {
   jsonFile, outRe string
 
+  force, delete bool
 
   source  FrameSource
 }
@@ -83,15 +84,20 @@ type JsonData struct {
 
 func ParseFlags() (Config,error) {
 
-  var conf = Config{}
 
 
+  var forceArg = flag.Bool("force", false, "Force creation of images")
+  var deleteArg = flag.Bool("delete", false, "Delete existing file which aren't in the JSON file")
   var imageRe = flag.String("image-re","","Image regexp")
   var outputRe = flag.String("output-re", "image_%06d.png", "Output directory")
 
   flag.Parse()
 
-  conf.jsonFile = flag.Arg(0)
+  var conf = Config{
+    force:    *forceArg,
+    delete:   *deleteArg,
+    jsonFile: flag.Arg(0),
+  }
 
   if conf.jsonFile == "" {
     return conf, fmt.Errorf("Must supply file on command line")
@@ -141,14 +147,21 @@ func main() {
   fmt.Printf("Parsed file %s with %d frames\n", conf.jsonFile, len(jsonFile.Frames) )
 
   for _,i := range jsonFile.Frames {
+
+
+    outpath := fmt.Sprintf( conf.outRe, i )
+    if _, err = os.Stat(outpath); !os.IsNotExist(err) && !conf.force {
+      log.Printf("File \"%s\" exists, skipping", outpath)
+      continue
+    }
+
+
     img,err := conf.source.Get(i)
 
     if err != nil {
       log.Printf("Couldn't load frame number %d: %s", i, err )
       continue
     }
-
-    outpath := fmt.Sprintf( conf.outRe, i )
 
     out,err := os.Create(outpath)
     if err != nil {
