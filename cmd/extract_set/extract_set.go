@@ -45,6 +45,30 @@ func main() {
 		set.ImageName = "image_%06d.png"
 	}
 
+	// Find existing files
+	transRe, _ := regexp.Compile("%[0-9]*d")
+
+	namePattern := transRe.ReplaceAllString(set.ImageName, "[\\d]*")
+	log.Printf("Converted filename pattern \"%s\" to regex \"%s\"", set.ImageName, namePattern)
+
+	nameRe, _ := regexp.Compile(namePattern)
+	dir, _ := os.Open(filepath.Dir(outdir))
+	defer dir.Close()
+
+	files, _ := dir.Readdirnames(0)
+	existingFiles = make([]string,0,len(files))
+
+	for _, filename := range files {
+		//log.Printf("Checking %s", filename)
+
+		if nameRe.MatchString(filename) {
+			//log.Printf("File %s matches pattern", filename)
+			filename = append(filename,existingFiles)
+		}
+	}
+
+
+
 	// Create the source
 	ext := filepath.Ext(source)
 	set.Source = os.ExpandEnv(set.Source)
