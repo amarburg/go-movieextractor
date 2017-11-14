@@ -23,13 +23,14 @@ type frameSet struct {
 
 func main() {
 
+	// Configuration variables
 	var outdir, basedir string
-	var doDelete bool
+	var doDelete, force bool
+
 	flag.StringVar(&outdir, "outdir", ".", "Output directory")
 	flag.StringVar(&basedir, "basedir", "", "Base directory")
-
 	flag.BoolVar(&doDelete, "delete", false, "Delete existing files not specified in set file")
-
+	flag.BoolVar(&force, "force", false, "Replace existing image files")
 	flag.Parse()
 
 	if len(flag.Args()) == 0 {
@@ -38,6 +39,7 @@ func main() {
 
 	source := flag.Args()[0]
 
+	// Load FrameSet JSON file
 	set := loadFrameSet(source)
 
 	if set.ImageName == "" {
@@ -45,29 +47,12 @@ func main() {
 		set.ImageName = "image_%06d.png"
 	}
 
-	// Find existing files
-	transRe, _ := regexp.Compile("%[0-9]*d")
+	nameRe := printfToRegexp( set.ImageName )
 
-	namePattern := transRe.ReplaceAllString(set.ImageName, "[\\d]*")
-	log.Printf("Converted filename pattern \"%s\" to regex \"%s\"", set.ImageName, namePattern)
-
-	nameRe, _ := regexp.Compile(namePattern)
-	dir, _ := os.Open(filepath.Dir(outdir))
-	defer dir.Close()
-
-	files, _ := dir.Readdirnames(0)
-	existingFiles = make([]string,0,len(files))
-
-	for _, filename := range files {
-		//log.Printf("Checking %s", filename)
-
-		if nameRe.MatchString(filename) {
-			//log.Printf("File %s matches pattern", filename)
-			filename = append(filename,existingFiles)
-		}
+	var existingFiles []string
+	if force == false {
+		existingFiles = findImageFiles( outdir, nameRe )
 	}
-
-
 
 	// Create the source
 	ext := filepath.Ext(source)
@@ -75,7 +60,8 @@ func main() {
 
 	log.Printf("Extracting %d frames from %s", len(set.Frames), set.Source)
 
-	var createdFiles []string
+	var createdFiles, unmatchedFiles []string
+
 	switch ext {
 	case ".mov":
 		fs, err := lazyfs.OpenLocalFile(set.Source)
@@ -88,7 +74,8 @@ func main() {
 			log.Fatalf("Error parsing Quicktime file \"%s\": %s", set.Source, err)
 		}
 
-		createdFiles = extractSetFrom(lqt, set, outdir)
+		createdFiles,unmatchedFiles = extractSetFrom(lqt, set, outdir, existingFiles)
+
 
 	case ".json":
 
@@ -102,38 +89,25 @@ func main() {
 			mm.BaseDir = basedir
 		}
 
-		createdFiles = extractSetFrom(mm, set, outdir)
+	createdFiles,unmatchedFiles = extractSetFrom(mm, set, outdir, existingFiles)
 
 	default:
 		log.Fatalf("Unsure what to do with input \"%s\"", source)
 	}
 
-	log.Printf("Created %d image files", len(createdFiles))
+
+
+	log.Printf("Created %d image files, %d orphaned files", len(createdFiles), len(unmatchedFiles))
 
 	if doDelete {
-		log.Printf("Handling doDelete")
+		log.Printf("Deleting orphaned image files")
 
-		// Convert set.ImageName to a regex
-		transRe, _ := regexp.Compile("%[0-9]*d")
-
-		namePattern := transRe.ReplaceAllString(set.ImageName, "[\\d]*")
-		log.Printf("Converted filename pattern \"%s\" to regex \"%s\"", set.ImageName, namePattern)
-
-		nameRe, _ := regexp.Compile(namePattern)
-
-		dir, _ := os.Open(filepath.Dir(outdir))
-
-		files, _ := dir.Readdirnames(0)
-		for _, filename := range files {
-			//log.Printf("Checking %s", filename)
-
-			if nameRe.MatchString(filename) {
-				//log.Printf("File %s matches pattern", filename)
-
-				if !stringInSlice(filename, createdFiles) {
-					log.Printf("Deleting file %s", filename)
-					os.Remove(filename)
-				}
+		for _, filename := range unmatchedFiles {
+			fullpath := filepath.Clean(filepath.Join(outdir,filename))
+			log.Printf("Deleting file %s", fullpath)
+			err := os.Remove(fullpath)
+			if err != nil {
+				log.Printf("Couldn't delete \"%s\": %s", fullpath, err)
 			}
 		}
 	}
@@ -160,25 +134,34 @@ func loadFrameSet(setFile string) frameSet {
 }
 
 //
-func extractSetFrom(ext lazyquicktime.MovieExtractor, set frameSet, outdir string) []string {
+func extractSetFrom(ext lazyquicktime.MovieExtractor, set frameSet,
+										outdir string, existing []string) (extractedFiles, unmatchedFiles []string) {
 
-	extractedFiles := make([]string, 0, len(set.Frames))
+	extractedFiles = make([]string, 0, len(set.Frames))
 
 	for _, frame := range set.Frames {
+		outname := fmt.Sprintf(set.ImageName, frame)
+
+		var found bool
+		existing,found = removeFromSlice(outname, existing)
+		if found == true {
+			log.Printf("File \"%s\" exists, skipping", outname)
+			continue
+		}
+
 		img, err := ext.ExtractFrame(frame)
 
 		if err != nil {
 			log.Fatalf("Unable to extract frame: %s", err)
 		}
 
-		outfile := filepath.Clean(filepath.Join(outdir, fmt.Sprintf(set.ImageName, frame)))
+		outpath := filepath.Clean(filepath.Join(outdir,outname))
+		writeImage(img, outpath)
 
-		writeImage(img, outfile)
-
-		extractedFiles = append(extractedFiles, outfile)
+		extractedFiles = append(extractedFiles, outname)
 	}
 
-	return extractedFiles
+	return extractedFiles, existing
 }
 
 func writeImage(img image.Image, path string) {
@@ -197,4 +180,53 @@ func stringInSlice(a string, list []string) bool {
 		}
 	}
 	return false
+}
+
+func removeFromSlice(a string, list []string) (out []string, found bool) {
+	for i, b := range list {
+		if b == a {
+			list[len(list)-1], list[i] = list[i], list[len(list)-1]
+			return list[:len(list)-1], true
+		}
+	}
+	return list, false
+}
+
+
+func printfToRegexp( printfFmt string ) (* regexp.Regexp) {
+	// Find existing files
+
+	digitsRe,_ := regexp.Compile("%[0-9]*d")
+
+	nameRegexp := digitsRe.ReplaceAllString(printfFmt, "[\\d]*")
+	log.Printf("Converted filename pattern \"%s\" to regex \"%s\"", printfFmt, nameRegexp)
+
+	nameRe, err := regexp.Compile(nameRegexp)
+
+	if( err != nil ){
+		log.Fatalf("Unable to compile filename regexp \"%s\"", nameRegexp)
+	}
+
+	return nameRe
+}
+
+
+
+func findImageFiles( path string, nameRe *regexp.Regexp ) ([]string) {
+	dir, _ := os.Open(filepath.Dir(path))
+	defer dir.Close()
+
+	files, _ := dir.Readdirnames(0)
+	existing := make([]string,0,len(files))
+
+	for _, filename := range files {
+		//log.Printf("Checking %s", filename)
+
+		if nameRe.MatchString(filename) {
+			//log.Printf("File %s matches pattern", filename)
+			existing = append(existing,filename)
+		}
+	}
+
+	return existing
 }
