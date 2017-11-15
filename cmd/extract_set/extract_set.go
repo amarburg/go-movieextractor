@@ -89,9 +89,9 @@ func extractSetFrom(ext lazyquicktime.MovieExtractor, frames []uint64,
 		outpath := pattern.MakePath(frame)
 
 		var found bool
+		before := len(existingFiles)
 		existingFiles, found = removeFromSlice(outpath, existingFiles)
 		if found == true {
-			log.Printf("File \"%s\" exists, skipping", outpath)
 			continue
 		}
 
@@ -101,11 +101,12 @@ func extractSetFrom(ext lazyquicktime.MovieExtractor, frames []uint64,
 			log.Fatalf("Unable to extract frame: %s", err)
 		}
 
+		log.Printf("Saving image to \"%s\"", outpath)
 		writeImage(img, outpath)
 	}
 
 	if doDelete {
-		log.Printf("Deleting orphaned image files")
+		log.Printf("Deleting %d orphaned image files", len(existingFiles))
 
 		for _, filename := range existingFiles {
 			log.Printf("Deleting file %s", filename)
@@ -125,15 +126,6 @@ func writeImage(img image.Image, path string) {
 
 	png.Encode(outfile, img)
 }
-
-// func stringInSlice(a string, list []string) bool {
-// 	for _, b := range list {
-// 		if b == a {
-// 			return true
-// 		}
-// 	}
-// 	return false
-// }
 
 func removeFromSlice(a string, list []string) (out []string, found bool) {
 	for i, b := range list {

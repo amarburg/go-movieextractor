@@ -47,18 +47,24 @@ func (ifp imageFilePattern) SetBaseDir(dir string) imageFilePattern {
 }
 
 func (ifp imageFilePattern) ExistingFiles() []string {
-	dir, _ := os.Open(filepath.Dir(ifp.dir))
+	fmt.Printf("Checking directory \"%s\"", ifp.dir)
+	dir, _ := os.Open(ifp.dir)
 	defer dir.Close()
 
-	files, _ := dir.Readdirnames(0)
+	files, err := dir.Readdirnames(0)
+	if err != nil {
+		log.Printf("Error reading filenames: %s", err)
+	}
 	existing := make([]string, 0, len(files))
 
 	for _, filename := range files {
-		//log.Printf("Checking %s", filename)
+		log.Printf("Checking %s", filename)
 
 		if ifp.re.MatchString(filename) {
-			//log.Printf("File %s matches pattern", filename)
+			log.Printf("File %s matches pattern", filename)
 			existing = append(existing, filepath.Join(ifp.dir, filename))
+		} else {
+			log.Printf("File %s does not match pattern", filename)
 		}
 	}
 
