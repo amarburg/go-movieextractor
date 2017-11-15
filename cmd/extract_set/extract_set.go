@@ -3,17 +3,13 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"fmt"
 	"github.com/amarburg/go-frameset"
-	"github.com/amarburg/go-lazyfs"
 	"github.com/amarburg/go-lazyquicktime"
-	"github.com/amarburg/go-multimov"
 	"image"
 	"image/png"
 	"log"
 	"os"
 	"path/filepath"
-	"regexp"
 )
 
 func main() {
@@ -21,6 +17,8 @@ func main() {
 	// Configuration variables
 	var outdir, basedir string
 	var doDelete, force bool
+
+	imageDir := "images/"
 
 	flag.StringVar(&outdir, "outdir", ".", "Output directory")
 	flag.StringVar(&basedir, "basedir", "", "Base directory")
@@ -37,8 +35,7 @@ func main() {
 	// Load FrameSet JSON file
 	set := loadFrameSet(source)
 
-	mm := makeMovieExtractor(set, basedir)
-
+	extractor := makeMovieExtractor(set, basedir)
 
 	log.Printf("Extracting %d frames from %s", len(set.Frames), set.Source)
 
@@ -47,16 +44,16 @@ func main() {
 		set.ImageName = "image_%06d.png"
 	}
 
-	nameRe := printfToRegexp(set.ImageName)
+	pattern := makeImageFilePattern(set.ImageName)
 
-	extractSetFrom(mm, set.Frames, outdir)
+	rootPattern := pattern.SetBaseDir(filepath.Join(outdir, imageDir))
+	extractSetFrom(extractor, set.Frames, rootPattern, force, doDelete)
 
-	//
-	// default:
-	// 	log.Fatalf("Unsure what to do with input \"%s\"", source)
-	// }
-
-	log.Printf("Created %d image files, %d orphaned files", len(createdFiles), len(unmatchedFiles))
+	for name, chunk := range set.Chunks {
+		chunkdir := filepath.Join(outdir, name, imageDir)
+		chunkPattern := pattern.SetBaseDir(chunkdir)
+		extractSetFrom(extractor, chunk.Frames, chunkPattern, force, doDelete)
+	}
 
 }
 
@@ -79,65 +76,22 @@ func loadFrameSet(setFile string) FrameSet.FrameSet {
 	return set
 }
 
-func makeMovieExtractor(set FrameSet.FrameSet, basedir string) lazyquicktime.MovieExtractor {
-	// Create the source
-	source := os.ExpandEnv(set.Source)
-	ext := filepath.Ext(source)
-
-	log.Printf("Extracting %d frames from %s", len(set.Frames), source)
-
-	switch ext {
-	case ".mov":
-		fs, err := lazyfs.OpenLocalFile(source)
-		if err != nil {
-			log.Fatalf("Error opening file \"%s\": %s", source, err)
-		}
-
-		lqt, err := lazyquicktime.LoadMovMetadata(fs)
-		if err != nil {
-			log.Fatalf("Error parsing Quicktime file \"%s\": %s", source, err)
-		}
-
-		return lqt
-
-	case ".json":
-
-		mm, err := multimov.LoadMultiMov(source)
-		if err != nil {
-			log.Fatalf("Error opening multimov file \"%s\": %s", source, err)
-		}
-
-		// If required rewrite the basedir for the source
-		if basedir != "" {
-			mm.BaseDir = basedir
-		}
-
-		return mm
-
-	default:
-		log.Fatalf("Unsure what to do with input \"%s\"", source)
-	}
-	return nil
-}
-
 //
 func extractSetFrom(ext lazyquicktime.MovieExtractor, frames []uint64,
-											outPattern string) {
+	pattern imageFilePattern, force bool, doDelete bool) {
 
-   var existingFiles []string
-   if force == false {
-           existingFiles = findImageFiles(outdir, nameRe)
-   }
-
-	extractedFiles = make([]string, 0, len(set.Frames))
+	var existingFiles []string
+	if force == false {
+		existingFiles = pattern.ExistingFiles()
+	}
 
 	for _, frame := range frames {
-		outname := fmt.Sprintf(outPattern, frame)
+		outpath := pattern.MakePath(frame)
 
 		var found bool
-		existing, found = removeFromSlice(outname, existing)
+		existingFiles, found = removeFromSlice(outpath, existingFiles)
 		if found == true {
-			log.Printf("File \"%s\" exists, skipping", outname)
+			log.Printf("File \"%s\" exists, skipping", outpath)
 			continue
 		}
 
@@ -147,21 +101,17 @@ func extractSetFrom(ext lazyquicktime.MovieExtractor, frames []uint64,
 			log.Fatalf("Unable to extract frame: %s", err)
 		}
 
-		outpath := filepath.Clean(filepath.Join(outdir, outname))
 		writeImage(img, outpath)
-
-		extractedFiles = append(extractedFiles, outname)
 	}
 
 	if doDelete {
 		log.Printf("Deleting orphaned image files")
 
-		for _, filename := range unmatchedFiles {
-			fullpath := filepath.Clean(filepath.Join(outdir, filename))
-			log.Printf("Deleting file %s", fullpath)
-			err := os.Remove(fullpath)
+		for _, filename := range existingFiles {
+			log.Printf("Deleting file %s", filename)
+			err := os.Remove(filename)
 			if err != nil {
-				log.Printf("Couldn't delete \"%s\": %s", fullpath, err)
+				log.Printf("Couldn't delete \"%s\": %s", filename, err)
 			}
 		}
 	}
@@ -193,40 +143,4 @@ func removeFromSlice(a string, list []string) (out []string, found bool) {
 		}
 	}
 	return list, false
-}
-
-func printfToRegexp(printfFmt string) *regexp.Regexp {
-	// Find existing files
-
-	digitsRe, _ := regexp.Compile("%[0-9]*d")
-
-	nameRegexp := digitsRe.ReplaceAllString(printfFmt, "[\\d]*")
-	log.Printf("Converted filename pattern \"%s\" to regex \"%s\"", printfFmt, nameRegexp)
-
-	nameRe, err := regexp.Compile(nameRegexp)
-
-	if err != nil {
-		log.Fatalf("Unable to compile filename regexp \"%s\"", nameRegexp)
-	}
-
-	return nameRe
-}
-
-func findImageFiles(path string, nameRe *regexp.Regexp) []string {
-	dir, _ := os.Open(filepath.Dir(path))
-	defer dir.Close()
-
-	files, _ := dir.Readdirnames(0)
-	existing := make([]string, 0, len(files))
-
-	for _, filename := range files {
-		//log.Printf("Checking %s", filename)
-
-		if nameRe.MatchString(filename) {
-			//log.Printf("File %s matches pattern", filename)
-			existing = append(existing, filename)
-		}
-	}
-
-	return existing
 }
