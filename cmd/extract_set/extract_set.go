@@ -37,6 +37,11 @@ func main() {
 	// Load FrameSet JSON file
 	set := loadFrameSet(source)
 
+	mm := makeMovieExtractor(set, basedir)
+
+
+	log.Printf("Extracting %d frames from %s", len(set.Frames), set.Source)
+
 	if set.ImageName == "" {
 		log.Print("No image name specified, using default \"image_%06d.png\"")
 		set.ImageName = "image_%06d.png"
@@ -44,49 +49,7 @@ func main() {
 
 	nameRe := printfToRegexp(set.ImageName)
 
-	var existingFiles []string
-	if force == false {
-		existingFiles = findImageFiles(outdir, nameRe)
-	}
-
-	mm := makeMovieExtractor(set, basedir)
-	//
-	// // Create the source
-	// set.Source = os.ExpandEnv(set.Source)
-	// ext := filepath.Ext(set.Source)
-
-	log.Printf("Extracting %d frames from %s", len(set.Frames), set.Source)
-
-	var createdFiles, unmatchedFiles []string
-
-	// switch ext {
-	// case ".mov":
-	// 	fs, err := lazyfs.OpenLocalFile(set.Source)
-	// 	if err != nil {
-	// 		log.Fatalf("Error opening file \"%s\": %s", set.Source, err)
-	// 	}
-	//
-	// 	lqt, err := lazyquicktime.LoadMovMetadata(fs)
-	// 	if err != nil {
-	// 		log.Fatalf("Error parsing Quicktime file \"%s\": %s", set.Source, err)
-	// 	}
-	//
-	// 	createdFiles, unmatchedFiles = extractSetFrom(lqt, set, outdir, existingFiles)
-	//
-	// case ".json":
-	//
-	// 	mm, err := multimov.LoadMultiMov(set.Source)
-	// 	if err != nil {
-	// 		log.Fatalf("Error opening multimov file \"%s\": %s", set.Source, err)
-	// 	}
-	//
-	// 	// If required rewrite the basedir for the source
-	// 	if basedir != "" {
-	// 		mm.BaseDir = basedir
-	// 	}
-	//
-
-	createdFiles, unmatchedFiles = extractSetFrom(mm, set, outdir, existingFiles)
+	extractSetFrom(mm, set.Frames, outdir)
 
 	//
 	// default:
@@ -94,19 +57,6 @@ func main() {
 	// }
 
 	log.Printf("Created %d image files, %d orphaned files", len(createdFiles), len(unmatchedFiles))
-
-	if doDelete {
-		log.Printf("Deleting orphaned image files")
-
-		for _, filename := range unmatchedFiles {
-			fullpath := filepath.Clean(filepath.Join(outdir, filename))
-			log.Printf("Deleting file %s", fullpath)
-			err := os.Remove(fullpath)
-			if err != nil {
-				log.Printf("Couldn't delete \"%s\": %s", fullpath, err)
-			}
-		}
-	}
 
 }
 
@@ -171,13 +121,18 @@ func makeMovieExtractor(set FrameSet.FrameSet, basedir string) lazyquicktime.Mov
 }
 
 //
-func extractSetFrom(ext lazyquicktime.MovieExtractor, set FrameSet.FrameSet,
-	outdir string, existing []string) (extractedFiles, unmatchedFiles []string) {
+func extractSetFrom(ext lazyquicktime.MovieExtractor, frames []uint64,
+											outPattern string) {
+
+   var existingFiles []string
+   if force == false {
+           existingFiles = findImageFiles(outdir, nameRe)
+   }
 
 	extractedFiles = make([]string, 0, len(set.Frames))
 
-	for _, frame := range set.Frames {
-		outname := fmt.Sprintf(set.ImageName, frame)
+	for _, frame := range frames {
+		outname := fmt.Sprintf(outPattern, frame)
 
 		var found bool
 		existing, found = removeFromSlice(outname, existing)
@@ -198,7 +153,18 @@ func extractSetFrom(ext lazyquicktime.MovieExtractor, set FrameSet.FrameSet,
 		extractedFiles = append(extractedFiles, outname)
 	}
 
-	return extractedFiles, existing
+	if doDelete {
+		log.Printf("Deleting orphaned image files")
+
+		for _, filename := range unmatchedFiles {
+			fullpath := filepath.Clean(filepath.Join(outdir, filename))
+			log.Printf("Deleting file %s", fullpath)
+			err := os.Remove(fullpath)
+			if err != nil {
+				log.Printf("Couldn't delete \"%s\": %s", fullpath, err)
+			}
+		}
+	}
 }
 
 func writeImage(img image.Image, path string) {
