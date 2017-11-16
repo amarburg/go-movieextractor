@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 func main() {
@@ -20,7 +21,7 @@ func main() {
 
 	imageDir := "images/"
 
-	flag.StringVar(&outdir, "outdir", ".", "Output directory")
+	flag.StringVar(&outdir, "outdir", "", "Output directory")
 	flag.StringVar(&basedir, "basedir", "", "Base directory")
 	flag.BoolVar(&doDelete, "delete", false, "Delete existing files not specified in set file")
 	flag.BoolVar(&force, "force", false, "Replace existing image files")
@@ -44,15 +45,22 @@ func main() {
 		set.ImageName = "image_%06d.png"
 	}
 
+	if outdir == "" {
+		outdir = filepath.Dir(source)
+	}
+
 	pattern := makeImageFilePattern(set.ImageName)
 
+	os.MkdirAll(filepath.Join(outdir, imageDir), os.ModePerm)
 	rootPattern := pattern.SetBaseDir(filepath.Join(outdir, imageDir))
 	extractSetFrom(extractor, set.Frames, rootPattern, force, doDelete)
 
 	for name, chunk := range set.Chunks {
 		chunkdir := filepath.Join(outdir, name, imageDir)
+		os.MkdirAll(chunkdir, os.ModePerm)
+
 		chunkPattern := pattern.SetBaseDir(chunkdir)
-		extractSetFrom(extractor, chunk.Frames, chunkPattern, force, doDelete)
+		extractSetFrom(extractor, chunk, chunkPattern, force, doDelete)
 	}
 
 }
@@ -89,13 +97,14 @@ func extractSetFrom(ext lazyquicktime.MovieExtractor, frames []uint64,
 		outpath := pattern.MakePath(frame)
 
 		var found bool
-		before := len(existingFiles)
 		existingFiles, found = removeFromSlice(outpath, existingFiles)
 		if found == true {
 			continue
 		}
 
+		start := time.Now()
 		img, err := ext.ExtractFrame(frame)
+		log.Printf("Extraction took %s", (time.Now().Sub(start)).String())
 
 		if err != nil {
 			log.Fatalf("Unable to extract frame: %s", err)
