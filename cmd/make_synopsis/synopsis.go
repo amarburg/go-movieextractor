@@ -57,13 +57,12 @@ func runSynopsis(cmd *cobra.Command, args []string) {
 	// Funtion map
 	fmap := template.FuncMap{
 		"makeImages": im.MakeImages,
-		"makeScrubNails": func(chunk frameset.NamedChunk) []ScrubNail {
+		"makeScrubNails": func(chunk frameset.Chunk) []ScrubNail {
 			return makeScrubNails(im, chunk)
 		},
 		"frameSetName": func(set frameset.FrameSet) string {
 			return filepath.Base(set.Source)
 		},
-		"sampleFramesFromChunk": sampleFramesFromChunk,
 	}
 
 	t := template.New("synopsis.tmpl")
@@ -78,12 +77,4 @@ func runSynopsis(cmd *cobra.Command, args []string) {
 		panic(err)
 	}
 
-}
-
-func sampleFramesFromChunk(chunk frameset.NamedChunk) []uint64 {
-	out := []uint64{}
-
-	out = append(out, chunk.Range.Start, chunk.Range.End)
-
-	return out
 }

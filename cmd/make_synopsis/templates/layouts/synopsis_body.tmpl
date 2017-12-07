@@ -10,11 +10,11 @@
       <th>Frames</th>
     </tr>
 
-{{ range .OrderedChunks }}
+{{ range .Chunks }}
     <tr>
-      <td align="center">{{ .Range.Start }}</td>
-      <td align="center">{{ .Range.End }}</td>
-      <td>{{ .Key }}</td>
+      <td align="center">{{ .Start }}</td>
+      <td align="center">{{ .End }}</td>
+      <td>{{ .Name }}</td>
       <td>
         {{ range makeScrubNails . }}
           <a href="" target="_blank" class="video-preview" data-frames="{{.NumFrames}}" data-source="{{.RelaScrubnailPath}}"></a>

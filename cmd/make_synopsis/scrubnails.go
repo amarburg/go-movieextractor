@@ -6,7 +6,6 @@ import (
 	"image/draw"
 	"image/png"
 	"log"
-	"math"
 	"os"
 	"path/filepath"
 	"strings"
@@ -35,19 +34,19 @@ func maxInt(a, b int) int {
 }
 
 
-func makeScrubNails(im *ImageMaker, chunk frameset.NamedChunk) []ScrubNail {
+func makeScrubNails(im *ImageMaker, chunk frameset.Chunk) []ScrubNail {
 	// Make configurable later
 	framesPerThumb := int(30 * 60)
 	framesPerImage := int(30 * 5)
 
-	numThumbs := int(math.Floor(float64(chunk.Range.End-chunk.Range.Start) / float64(framesPerThumb)))
+	numThumbs := int( (chunk.End-chunk.Start) / uint64(framesPerThumb) )
 
 	scrubnails := make([]ScrubNail, numThumbs)
 
 	for i := range scrubnails {
 
-		offset := chunk.Range.Start + uint64(i*framesPerThumb)
-		thumbLength := int(minUint64(uint64(framesPerThumb), chunk.Range.End-offset))
+		offset := chunk.Start + uint64(i*framesPerThumb)
+		thumbLength := int(minUint64(uint64(framesPerThumb), chunk.End-offset))
 
 		numImages := thumbLength / framesPerImage
 		thumbnails := make([]Images, numImages)
