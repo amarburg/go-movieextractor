@@ -1,0 +1,25 @@
+<body>
+
+  <h1>{{frameSetName . }}</h1>
+
+  <table>
+    <tr>
+      <th>Start frame</th>
+      <th>End frame</th>
+      <th>Name</th>
+      <th>Frames</th>
+    </tr>
+
+{{ range .OrderedChunks }}
+    <tr>
+      <td align="center">{{ .Range.Start }}</td>
+      <td align="center">{{ .Range.End }}</td>
+      <td>{{ .Key }}</td>
+      <td>
+        {{ range sampleFramesFromChunk . }}{{ $imgSet := makeImages . }}<a href="{{ $imgSet.ImgPath }}"><img alt="{{$imgSet.FrameNum}}" src="{{ $imgSet.ThumbPath }}"/></a>{{ end }}
+      </td>
+    </tr>
+{{ end }}
+
+  </table>
+</body>
