@@ -26,6 +26,15 @@ func minUint64(a, b uint64) uint64 {
 	return b
 }
 
+// Some helpful math helpers
+func maxInt(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+
 func makeScrubNails(im *ImageMaker, chunk frameset.NamedChunk) []ScrubNail {
 	// Make configurable later
 	framesPerThumb := int(30 * 60)
@@ -83,10 +92,6 @@ func makeScrubNails(im *ImageMaker, chunk frameset.NamedChunk) []ScrubNail {
 
 // Bundle the name of a sprite image with its viewport into the spritesheet.
 type Sprite struct {
-	//Name          string
-	// MagFactor     float64
-	TopPadding    int
-	BottomPadding int
 	image.Rectangle
 }
 
@@ -127,31 +132,14 @@ func GenerateSpriteSheet(images []Images) draw.Image {
 	for _, img := range imgs {
 		bounds := img.Bounds()
 
-		thisTopPadding := float64(1)
-		thisBottomPadding := thisTopPadding
-
-		var prevBottomPadding float64
-		if len(sprites) == 0 {
-			prevBottomPadding = 0
-			thisTopPadding = 0
-		} else {
-			prevBottomPadding = float64(sprites[len(sprites)-1].BottomPadding)
-		}
-
-		thisTopPadding = math.Max(thisTopPadding, prevBottomPadding)
-		thisTopPaddingInt := int(thisTopPadding)
-		thisBottomPaddingInt := int(thisBottomPadding)
 		newSprite := Sprite{
-			thisTopPaddingInt,
-			thisBottomPaddingInt,
-			image.Rect(0, sheetHeight+thisTopPaddingInt, bounds.Dx(), sheetHeight+thisTopPaddingInt+bounds.Dy()),
+			image.Rect(sheetWidth, 0, sheetWidth+bounds.Dx(), bounds.Dy()),
 		}
 		sprites = append(sprites, newSprite)
 
-		sheetHeight += bounds.Dy() + thisTopPaddingInt
-		if bounds.Dx() > sheetWidth {
-			sheetWidth = bounds.Dx()
-		}
+		sheetWidth += bounds.Dx()
+    sheetHeight = maxInt( sheetHeight, bounds.Dy() )
+
 	}
 
 	// create the sheet image
