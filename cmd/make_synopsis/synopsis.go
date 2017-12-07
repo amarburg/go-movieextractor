@@ -57,6 +57,9 @@ func runSynopsis(cmd *cobra.Command, args []string) {
 	// Funtion map
 	fmap := template.FuncMap{
 		"makeImages": im.MakeImages,
+		"makeScrubNails": func(chunk frameset.NamedChunk) []ScrubNail {
+			return makeScrubNails(im, chunk)
+		},
 		"frameSetName": func(set frameset.FrameSet) string {
 			return filepath.Base(set.Source)
 		},

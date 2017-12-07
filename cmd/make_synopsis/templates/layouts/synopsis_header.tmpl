@@ -1,3 +1,82 @@
 <head>
   <title>{{ frameSetName . }}</title>
+
+    <script type="text/javascript" src="//code.jquery.com/jquery-2.1.0.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+    <style type="text/css">
+  body {
+      text-align: center;
+      padding-top: 20px;
+  }
+
+  body > div {/*
+      display: inline-block;*/
+  }
+
+  .video-preview {
+      display: inline-block;
+      position: relative;
+      background: #ddd;
+      overflow: hidden;
+      /* This is temporary width and height, these'll be overriden when the source img is loaded. */
+      /* If you already know size of a preview frame you can hardcode it here. */
+      width: 160px;
+      height: 120px;
+      border-radius: 3px;
+      box-shadow: 0 0 6px #bbb;
+  }
+    </style>
+
+  <script type='text/javascript'>//<![CDATA[
+  $(window).load(function(){
+  (function($) {
+      $.fn.videoPreview = function(options) {
+          return this.each(function() {
+              var elm = $(this);
+              var frames = parseFloat(elm.data('frames'));
+
+              var img = $('<img/>', { 'src': elm.data('source') }).hide().css({
+                  'position': 'absolute',
+                  'cursor': 'pointer'
+              }).appendTo(elm);
+              var slider = $('<div/>').hide().css({
+                  'width': '2px',
+                  'height': '100%',
+                  'background': '#ddd',
+                  'position': 'absolute',
+                  'z-index': '1',
+                  'top': '0',
+                  'opacity': 0.6,
+                  'cursor': 'pointer'
+              }).appendTo(elm);
+
+              var width;
+
+              function defaultPos() {
+                  img.css('left', -width * frames / 4);
+              }
+
+              img.load(function() {
+                  $(this).show();
+                  width = this.width / frames;
+                  elm.css('width', width);
+                  defaultPos();
+              });
+              elm.mousemove(function(e) {
+                  var left = e.clientX - elm.position().left;
+                  slider.show().css('left', left - 1); // -1 because it's 2px width
+                  img.css('left', -Math.floor((left / width) * frames) * width);
+              }).mouseleave(function(e) {
+                  slider.hide();
+              });
+
+          });
+      };
+  })(jQuery);
+
+  $('.video-preview').videoPreview();
+  });//]]>
+
+  </script>
 </head>
