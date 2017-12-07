@@ -51,8 +51,8 @@ func initConfig() {
 
 func main() {
 	var rootCmd = &cobra.Command{
-		Use:   "make_proof_sheet",
-		Short: "Hugo is a very fast static site generator",
+		Use:   "make_synopsis",
+		Short: ".....",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			// Do Stuff Here
@@ -63,35 +63,6 @@ func main() {
 
 	rootCmd.PersistentFlags().StringVar(&OutputDir, "output", "./_html", "Output directory (default is ./_html)")
 
-	rootCmd.AddCommand(cmdProofSheet)
 	rootCmd.AddCommand(cmdSynopsis)
 	rootCmd.Execute()
 }
-
-// package main
-//
-// import (
-// 	"flag"
-// 	"github.com/google/subcommands"
-// 	"context"
-// )
-//
-// var count uint
-//
-// func main() {
-//
-// 	topLevelFlags := flag.NewFlagSet("top level", flag.ExitOnError)
-//
-// 	var outdir string
-// 	flag.StringVar(&outdir, "outdir", "_html", "Directory for resulting html files")
-//
-// 	commander := subcommands.NewCommander( topLevelFlags, "make_proof_sheet" )
-//
-// 	commander.Register( subcommands.HelpCommand(), "" )
-// 	commander.Register( subcommands.FlagsCommand(), "" )
-// 	commander.Register( NewProofSheetCommand(), "" )
-// 	commander.Register( NewSynopsisCommand(), "" )
-//
-// 	commander.Execute( context.Background(), outdir )
-//
-// }

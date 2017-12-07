@@ -1,4 +1,4 @@
-package multimov
+package frameset
 
 import (
 	"encoding/json"

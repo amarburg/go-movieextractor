@@ -2,20 +2,14 @@ package main
 
 import (
 	//"flag"
+	"github.com/amarburg/go-frameset"
 	"github.com/amarburg/go-multimov"
-	"log"
-	// "fmt"
-	"html/template"
-	// "image"
-	// "image/png"
-	// "math"
-	// "os"
 	"github.com/spf13/cobra"
+	"html/template"
+	"log"
 	"os"
 	"path/filepath"
 )
-
-//var templateFile string
 
 var cmdSynopsis = &cobra.Command{
 	Use:   "synopsis [image set file]",
@@ -36,7 +30,7 @@ func runSynopsis(cmd *cobra.Command, args []string) {
 
 	source := args[0]
 
-	set, err := multimov.LoadFrameSet(source)
+	set, err := frameset.LoadFrameSet(source)
 	if err != nil {
 		log.Fatalf("Unable to load FrameSet from \"%s\": %s", source, err)
 	}
@@ -63,7 +57,7 @@ func runSynopsis(cmd *cobra.Command, args []string) {
 	// Funtion map
 	fmap := template.FuncMap{
 		"makeImages": im.MakeImages,
-		"frameSetName": func(set multimov.FrameSet) string {
+		"frameSetName": func(set frameset.FrameSet) string {
 			return filepath.Base(set.Source)
 		},
 		"sampleFramesFromChunk": sampleFramesFromChunk,
@@ -83,7 +77,7 @@ func runSynopsis(cmd *cobra.Command, args []string) {
 
 }
 
-func sampleFramesFromChunk(chunk multimov.NamedChunk) []uint64 {
+func sampleFramesFromChunk(chunk frameset.NamedChunk) []uint64 {
 	out := []uint64{}
 
 	out = append(out, chunk.Range.Start, chunk.Range.End)
