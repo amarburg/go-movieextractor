@@ -54,9 +54,6 @@ func main() {
 		Use:   "make_synopsis",
 		Short: ".....",
 		Long:  ``,
-		Run: func(cmd *cobra.Command, args []string) {
-			// Do Stuff Here
-		},
 	}
 
 	//cobra.OnInitialize(initConfig)
