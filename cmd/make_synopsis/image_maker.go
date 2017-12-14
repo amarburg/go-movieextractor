@@ -24,7 +24,7 @@ type Images struct {
 func NewImageMaker(mm lazyquicktime.MovieExtractor, ot OutTree) *ImageMaker {
 	return &ImageMaker{
 		mm:    mm,
-		scale: 0.1,
+		scale: 0.25,
 		ot:    ot,
 	}
 }
@@ -60,11 +60,18 @@ func (im *ImageMaker) MakeImages(frameNum uint64) Images {
 		log.Printf("Making thumbnail %s", thumbFilename)
 
 		if img == nil {
-			imgFile, _ := os.Create(imgFilename)
-			img, _ = png.Decode(imgFile)
+			imgFile, err := os.Create(imgFilename)
+			if err != nil {
+				log.Printf("Error opening %s: %s", imgFilename, err)
+			}
+			img, err = png.Decode(imgFile)
+			if err != nil {
+				log.Printf("Error decoding png %s: %s", imgFilename, err)
+			 }
 			imgFile.Close()
 		}
 
+		if img != nil {
 		thumb := image.NewRGBA(image.Rect(0, 0,
 			int(float32(img.Bounds().Dx())*im.scale),
 			int(float32(img.Bounds().Dy())*im.scale)))
@@ -72,6 +79,7 @@ func (im *ImageMaker) MakeImages(frameNum uint64) Images {
 		thumbFile, _ := os.Create(thumbFilename)
 		png.Encode(thumbFile, thumb)
 		thumbFile.Close()
+}
 	}
 
 	return images

@@ -7,6 +7,7 @@
       <th>Start frame</th>
       <th>End frame</th>
       <th>Name</th>
+      <th>Description</th>
       <th>Frames</th>
     </tr>
 
@@ -15,6 +16,7 @@
       <td align="center">{{ .Start }}</td>
       <td align="center">{{ .End }}</td>
       <td>{{ .Name }}</td>
+      <td>{{ .Description }}</td>
       <td>
         {{ range makeScrubNails . }}
           <a href="" target="_blank" class="video-preview" data-frames="{{.NumFrames}}" data-source="{{.RelaScrubnailPath}}"></a>
