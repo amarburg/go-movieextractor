@@ -9,6 +9,7 @@ import (
 	//"github.com/spf13/viper"
 )
 
+// Global configuration variables
 var OutputDir string
 
 // func init() {
@@ -61,5 +62,6 @@ func main() {
 	rootCmd.PersistentFlags().StringVar(&OutputDir, "output", "./_html", "Output directory (default is ./_html)")
 
 	rootCmd.AddCommand(cmdSynopsis)
+	rootCmd.AddCommand(cmdHttpServer)
 	rootCmd.Execute()
 }
