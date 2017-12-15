@@ -4,7 +4,7 @@ package framesource
 import (
 	"fmt"
 	"github.com/amarburg/go-lazyquicktime"
-	"github.com/amarburg/go-frameset"
+	"github.com/amarburg/go-frameset/frameset"
 	"image"
 	"io"
 )

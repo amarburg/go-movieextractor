@@ -1,7 +1,7 @@
 package framesource
 
 import (
-	"github.com/amarburg/go-frameset"
+	"github.com/amarburg/go-frameset/frameset"
 	"image"
 )
 

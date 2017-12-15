@@ -3,7 +3,7 @@ package frameset
 import (
 	"fmt"
 	"github.com/amarburg/go-lazyquicktime"
-	"github.com/amarburg/go-multimov"
+	"github.com/amarburg/go-frameset/multimov"
 	"os"
 	"path/filepath"
 )
