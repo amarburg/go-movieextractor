@@ -2,12 +2,50 @@ package frameset
 
 import (
 	"fmt"
-	"github.com/amarburg/go-lazyfs"
 	"github.com/amarburg/go-lazyquicktime"
 	"github.com/amarburg/go-multimov"
+	"github.com/amarburg/go-lazyfs"
 	"os"
 	"path/filepath"
 )
+
+
+// Technically this could be in multimov?
+func MovieExtractorFromPath(path string) (lazyquicktime.MovieExtractor, error) {
+
+	if filepath.Ext(path) == ".mov" {
+
+		file, err := lazyfs.SourceFromPath(path)
+
+		if err != nil {
+			return nil, err
+		}
+
+		qtInfo, err := lazyquicktime.LoadMovMetadata(file)
+
+		if err != nil {
+			return nil, err
+		}
+
+		return qtInfo, nil
+
+	} else if filepath.Ext(path) == ".json" {
+
+		fmt.Println(path)
+
+		mm, err := multimov.LoadMultiMov(path)
+		if err != nil {
+			return nil, err
+		}
+
+		return mm, nil
+
+	}
+
+	return nil, fmt.Errorf("Can't make a movie extractor from file %s", path)
+
+}
+
 
 func (set FrameSet) MovieExtractor() (lazyquicktime.MovieExtractor, error) {
 	// Create the source
@@ -22,33 +60,7 @@ func (set FrameSet) MovieExtractor() (lazyquicktime.MovieExtractor, error) {
 		source = filepath.Clean(filepath.Join(filepath.Dir(set.filepath), source))
 	}
 
-	ext := filepath.Ext(source)
+	return MovieExtractorFromPath( source )
 
-	switch ext {
-	case ".mov":
-		fs, err := lazyfs.OpenLocalFile(source)
-		if err != nil {
-			return nil, fmt.Errorf("Error opening file \"%s\": %s", source, err)
-		}
-
-		lqt, err := lazyquicktime.LoadMovMetadata(fs)
-		if err != nil {
-			return nil, fmt.Errorf("Error parsing Quicktime file \"%s\": %s", source, err)
-		}
-
-		return lqt, nil
-
-	case ".json":
-
-		mm, err := multimov.LoadMultiMov(source)
-		if err != nil {
-			return nil, fmt.Errorf("Error opening multimov file \"%s\": %s", source, err)
-		}
-
-		return mm, nil
-
-	default:
-		return nil, fmt.Errorf("Unsure what to do with input \"%s\"", source)
-	}
 
 }
