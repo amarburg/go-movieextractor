@@ -70,9 +70,9 @@ func (source *FrameSetFrameSource) Advance() {
 
 }
 
-func (source *FrameSetFrameSource) Next() (image.Image, error) {
+func (source *FrameSetFrameSource) Next() (image.Image, uint64, error) {
 	if err := source.Valid(); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	chunk := source.FrameSet.Chunks[source.chunkIdx]
@@ -86,5 +86,6 @@ func (source *FrameSetFrameSource) Next() (image.Image, error) {
 
 	defer source.Advance()
 
-	return source.Movie.ExtractFrame(frame)
+	img, err := source.Movie.ExtractFrame(frame)
+	return img, frame, err
 }

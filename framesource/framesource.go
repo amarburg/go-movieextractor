@@ -7,7 +7,7 @@ import (
 
 // MovieExtractor is the abstract interface to a quicktime movie.
 type FrameSource interface {
-	Next() (image.Image, error)
+	Next() (image.Image, uint64, error)
 }
 
 func MakeFrameSourceFromPath(  path string ) (FrameSource,error) {
