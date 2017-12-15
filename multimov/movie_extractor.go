@@ -27,8 +27,6 @@ func MovieExtractorFromPath(path string) (lazyquicktime.MovieExtractor, error) {
 
 	} else if filepath.Ext(path) == ".json" {
 
-		fmt.Println(path)
-
 		mm, err := LoadMultiMov(path)
 		if err != nil {
 			return nil, err

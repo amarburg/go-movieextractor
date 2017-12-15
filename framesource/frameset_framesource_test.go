@@ -1,18 +1,18 @@
 package framesource
 
 import (
-	"github.com/amarburg/go-frameset"
+	"github.com/amarburg/go-frameset/frameset"
 	"github.com/amarburg/go-lazyfs-testfiles/frameset"
 	"io"
 	"testing"
 )
 
-func goodMultiMovJsonTest( t *testing.T, source FrameSource ) {
+func goodFrameSourceTest(t *testing.T, source FrameSource) {
 	frames := 0
-  done := false
+	done := false
 
 	for done == false {
-		_, err := source.Next()
+		_, _, err := source.Next()
 
 		switch err {
 		case io.EOF:
@@ -23,7 +23,7 @@ func goodMultiMovJsonTest( t *testing.T, source FrameSource ) {
 		}
 
 		frames++
-    t.Logf("Got frame %d", frames)
+		t.Logf("Got frame %d", frames)
 
 		// TODO.  Check that frames are valid.
 	}
@@ -47,7 +47,6 @@ func TestFrameSetFrameSourceGoodJson(t *testing.T) {
 		t.Errorf("Unable to make frame source from good.json: %s", err)
 	}
 
-	goodMultiMovJsonTest( t, source )
-
+	goodFrameSourceTest(t, source)
 
 }

@@ -2,6 +2,7 @@ package framesource
 
 import (
 	"github.com/amarburg/go-frameset/frameset"
+	"github.com/amarburg/go-frameset/multimov"
 	"image"
 )
 
@@ -10,16 +11,26 @@ type FrameSource interface {
 	Next() (image.Image, uint64, error)
 }
 
-func MakeFrameSourceFromPath(  path string ) (FrameSource,error) {
+func MakeFrameSourceFromPath(path string) (FrameSource, error) {
 
 	// Is it a Frameset, a multimov or a movie?
 
 	// Check if it parses as a FrameSet
-	set,err := frameset.LoadFrameSet(path)
+	set, err := frameset.LoadFrameSet(path)
 
 	if err == nil {
 		return MakeFrameSetFrameSource(set)
 	}
 
-	return nil,err
+	if _, ok := err.(frameset.NotAFrameSetError); !ok {
+		return nil, err
+	}
+
+	ext, err := multimov.MovieExtractorFromPath(path)
+
+	if err == nil {
+		return MakeMovieExtractorFrameSource(ext)
+	}
+
+	return nil, err
 }

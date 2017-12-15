@@ -3,6 +3,7 @@ package frameset
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"sort"
 )
@@ -41,6 +42,12 @@ func (c Chunk) HasFrames() bool {
 	return len(c.Frames) > 0
 }
 
+type NotAFrameSetError struct{}
+
+func (f NotAFrameSetError) Error() string {
+	return "Not a frameset"
+}
+
 // LoadMultiMov reads a MultiMov from the a path to a given JSON file.
 // Returns a pointer to a new MultiMov if successful, or nil and
 // an error if unsuccessful
@@ -55,6 +62,15 @@ func LoadFrameSet(path string) (*FrameSet, error) {
 	decoder := json.NewDecoder(file)
 	set := new(FrameSet)
 	err = decoder.Decode(set)
+
+	if err != nil {
+		log.Printf("Error decoding JSON: %s", err)
+		return nil, err
+	}
+
+	if len(set.Source) == 0 {
+		return nil, NotAFrameSetError{}
+	}
 
 	// First validate.   Can either have Start or Frames but not both
 	for i, chunk := range set.Chunks {

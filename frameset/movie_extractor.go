@@ -2,15 +2,15 @@ package frameset
 
 import (
 	"fmt"
-	"github.com/amarburg/go-lazyquicktime"
 	"github.com/amarburg/go-frameset/multimov"
+	"github.com/amarburg/go-lazyquicktime"
 	"os"
 	"path/filepath"
 )
 
-
 func (set FrameSet) MovieExtractor() (lazyquicktime.MovieExtractor, error) {
 	// Create the source
+
 	source := os.ExpandEnv(set.Source)
 
 	// If path is relative, evaluate it relative to the input file...
@@ -22,7 +22,6 @@ func (set FrameSet) MovieExtractor() (lazyquicktime.MovieExtractor, error) {
 		source = filepath.Clean(filepath.Join(filepath.Dir(set.filepath), source))
 	}
 
-	return multimov.MovieExtractorFromPath( source )
-
+	return multimov.MovieExtractorFromPath(source)
 
 }

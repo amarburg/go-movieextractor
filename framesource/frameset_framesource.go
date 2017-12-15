@@ -1,10 +1,9 @@
-
 package framesource
 
 import (
 	"fmt"
-	"github.com/amarburg/go-lazyquicktime"
 	"github.com/amarburg/go-frameset/frameset"
+	"github.com/amarburg/go-lazyquicktime"
 	"image"
 	"io"
 )
@@ -43,8 +42,8 @@ func (source *FrameSetFrameSource) Valid() error {
 			return fmt.Errorf("Frame offset is off end of frame array (error) in chunk %d; %d >= %d", source.chunkIdx, source.frameIdx, len(chunk.Frames))
 		}
 	} else if (chunk.Start + source.segmentOffset) >= chunk.End {
-			return fmt.Errorf("Segment offset is off end of segment (error) in chunk %d; %d >= %d", source.chunkIdx, (chunk.Start + source.segmentOffset), chunk.End)
-		}
+		return fmt.Errorf("Segment offset is off end of segment (error) in chunk %d; %d >= %d", source.chunkIdx, (chunk.Start + source.segmentOffset), chunk.End)
+	}
 
 	return nil
 }
@@ -63,10 +62,10 @@ func (source *FrameSetFrameSource) Advance() {
 			source.chunkIdx++
 		}
 	} else if (chunk.Start + source.segmentOffset) >= chunk.End {
-			source.frameIdx = 0
-			source.segmentOffset = 0
-			source.chunkIdx++
-		}
+		source.frameIdx = 0
+		source.segmentOffset = 0
+		source.chunkIdx++
+	}
 
 }
 
