@@ -1,34 +1,31 @@
-package frameset
+
+package framesource
 
 import (
 	"fmt"
 	"github.com/amarburg/go-lazyquicktime"
+	"github.com/amarburg/go-frameset"
 	"image"
 	"io"
 )
 
-// MovieExtractor is the abstract interface to a quicktime movie.
-type FrameSource interface {
-	Next() (image.Image, error)
-}
-
 type FrameSetFrameSource struct {
-	*FrameSet
+	*frameset.FrameSet
 	Movie         lazyquicktime.MovieExtractor
 	chunkIdx      int
 	frameIdx      int
 	segmentOffset uint64
 }
 
-func MakeFrameSetFrameSource(set *FrameSet) (FrameSetFrameSource, error) {
+func MakeFrameSetFrameSource(set *frameset.FrameSet) (*FrameSetFrameSource, error) {
 
 	mm, err := set.MovieExtractor()
 
 	if err != nil {
-		return FrameSetFrameSource{}, err
+		return &FrameSetFrameSource{}, err
 	}
 
-	return FrameSetFrameSource{
+	return &FrameSetFrameSource{
 		FrameSet: set,
 		Movie:    mm,
 	}, nil

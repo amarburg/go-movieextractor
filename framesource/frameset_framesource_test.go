@@ -1,25 +1,13 @@
-package frameset
+package framesource
 
 import (
+	"github.com/amarburg/go-frameset"
 	"github.com/amarburg/go-lazyfs-testfiles/frameset"
 	"io"
 	"testing"
 )
 
-func TestFrameSourceGoodJson(t *testing.T) {
-
-	set, err := LoadFrameSet(frameset_testfiles.GoodMultiMovJson)
-
-	if err != nil {
-		t.Errorf("Unable to load good.json: %s", err)
-	}
-
-	source, err := MakeFrameSetFrameSource(set)
-
-	if err != nil {
-		t.Errorf("Unable to make frame source from good.json: %s", err)
-	}
-
+func goodMultiMovJsonTest( t *testing.T, source FrameSource ) {
 	frames := 0
   done := false
 
@@ -43,5 +31,23 @@ func TestFrameSourceGoodJson(t *testing.T) {
 	if frames != frameset_testfiles.GoodMultiMovJsonFrames {
 		t.Errorf("Didn't get as many frames as I expected %d, rather than %d", frames, frameset_testfiles.GoodMultiMovJsonFrames)
 	}
+}
+
+func TestFrameSetFrameSourceGoodJson(t *testing.T) {
+
+	set, err := frameset.LoadFrameSet(frameset_testfiles.GoodMultiMovJson)
+
+	if err != nil {
+		t.Errorf("Unable to load good.json: %s", err)
+	}
+
+	source, err := MakeFrameSetFrameSource(set)
+
+	if err != nil {
+		t.Errorf("Unable to make frame source from good.json: %s", err)
+	}
+
+	goodMultiMovJsonTest( t, source )
+
 
 }
