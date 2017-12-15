@@ -2,13 +2,13 @@ package frameset
 
 import (
 	"encoding/json"
-	//"log"
 	"fmt"
 	"os"
 	"sort"
 )
 
 type FrameSet struct {
+	filepath  string
 	Source    string
 	Chunks    SliceOfChunks `json:",omitempty"`
 	ImageName string
@@ -29,12 +29,16 @@ type Chunk struct {
 }
 
 func (c Chunk) Min() uint64 {
-	if len(c.Frames) > 0 {
+	if c.HasFrames() {
 		// Assume sorted
 		return c.Frames[0]
 	}
 
 	return c.Start
+}
+
+func (c Chunk) HasFrames() bool {
+	return len(c.Frames) > 0
 }
 
 // LoadMultiMov reads a MultiMov from the a path to a given JSON file.
@@ -54,7 +58,7 @@ func LoadFrameSet(path string) (*FrameSet, error) {
 
 	// First validate.   Can either have Start or Frames but not both
 	for i, chunk := range set.Chunks {
-		if len(chunk.Frames) > 0 && chunk.Start != 0 {
+		if chunk.HasFrames() && chunk.Start != 0 {
 			return nil, fmt.Errorf("Chunk \"%s\" has both frames and a start", chunk.Name)
 		}
 
@@ -76,6 +80,8 @@ func LoadFrameSet(path string) (*FrameSet, error) {
 			}
 		}
 	}
+
+	set.filepath = path
 
 	return set, err
 }
