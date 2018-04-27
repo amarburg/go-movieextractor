@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 	"sort"
+	"github.com/amarburg/go-frameset/virtualmov"
+	"github.com/amarburg/go-frameset/multimov"
 )
 
 type FrameSet struct {
@@ -110,3 +112,31 @@ func (p SliceOfChunks) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 func (p UInt64Slice) Len() int           { return len(p) }
 func (p UInt64Slice) Less(i, j int) bool { return p[i] < p[j] }
 func (p UInt64Slice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+
+
+
+
+func (fs *FrameSet) ChunkNames() []string {
+	var names []string
+	for _,chunk := range fs.Chunks {
+		names = append(names, chunk.Name)
+	}
+	return names
+}
+
+func (fs *FrameSet) MovFromChunk(name string) (virtualmov.VirtualMov, error) {
+	for _,chunk := range fs.Chunks {
+		if chunk.Name == name {
+
+			ex,err := multimov.MovieExtractorFromPath( fs.Source )
+
+			if err != nil {
+					return virtualmov.VirtualMov{}, err
+			}
+
+			return virtualmov.CreateVirtualMov(ex, chunk.Start, chunk.End)
+		}
+	}
+
+		return virtualmov.VirtualMov{}, fmt.Errorf("Couldn't find chunk \"%s\"", name )
+}
