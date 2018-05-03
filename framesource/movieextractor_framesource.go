@@ -6,18 +6,27 @@ import (
 	"image"
 )
 
+// Thin wrapper around a MovieExtractor which implements FrameSource
 type MovieExtractorFrameSource struct {
 	lazyquicktime.MovieExtractor
 	frameNum uint64
 }
 
-func MakeMovieExtractorFrameSource(ext lazyquicktime.MovieExtractor) (*MovieExtractorFrameSource, error) {
 
+func (ext lazyquicktime.MovieExtractor) FrameSource() (*MovieExtractorFrameSource, error) {
 	return &MovieExtractorFrameSource{
 		MovieExtractor: ext,
 		frameNum:       1,
 	}, nil
 }
+
+// func MakeMovieExtractorFrameSource(ext lazyquicktime.MovieExtractor) (*MovieExtractorFrameSource, error) {
+//
+// 	return &MovieExtractorFrameSource{
+// 		MovieExtractor: ext,
+// 		frameNum:       1,
+// 	}, nil
+// }
 
 func (source *MovieExtractorFrameSource) Next() (image.Image, uint64, error) {
 
@@ -29,4 +38,8 @@ func (source *MovieExtractorFrameSource) Next() (image.Image, uint64, error) {
 	source.frameNum++
 
 	return img, source.frameNum - 1, err
+}
+
+func (source *MovieExtractorFrameSource) FrameNum() uint64 {
+	return source.frameNum
 }

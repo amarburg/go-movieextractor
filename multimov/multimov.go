@@ -118,7 +118,7 @@ func (mm MultiMov) Offset(frame uint64) (MovHash, uint64, error) {
 	for _, h := range mm.Sequence {
 		mov, has := mm.Movies[h.Hash]
 		if has == false {
-			return 0, 0, fmt.Errorf("Error loading hash %s from movie table", h)
+			return 0, 0, fmt.Errorf("Error loading hash from movie table")
 		}
 
 		if frame > h.FrameOffset && frame <= h.FrameOffset+uint64(mov.NumFrames) {

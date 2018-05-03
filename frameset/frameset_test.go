@@ -7,13 +7,13 @@ import (
 
 func TestLoadGoodJson(t *testing.T) {
 
-	set, err := LoadFrameSet(frameset_testfiles.GoodMultiMovJson)
+	set, err := LoadFrameSet(frameset_testfiles.GoodFrameSetJson)
 
 	if err != nil {
-		t.Error("Unable to load good.json: %s", err)
+		t.Errorf("Unable to load good.json: %s", err)
 	}
 
-	const NumChunks = frameset_testfiles.GoodMultiMovJsonChunks
+	const NumChunks = frameset_testfiles.GoodFrameSetJsonChunks
 	FrameLengths := []int{3, 0, 2, 0, 0}
 	ChunkMins := []uint64{1, 20, 30, 50, 60}
 	ChunkStarts := []uint64{0, 20, 0, 50, 60}

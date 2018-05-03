@@ -6,9 +6,10 @@ import (
 	"image"
 )
 
-// MovieExtractor is the abstract interface to a quicktime movie.
+//
 type FrameSource interface {
 	Next() (image.Image, uint64, error)
+	//FrameNum() (uint64)
 }
 
 func MakeFrameSourceFromPath(path string) (FrameSource, error) {
@@ -28,9 +29,10 @@ func MakeFrameSourceFromPath(path string) (FrameSource, error) {
 
 	ext, err := multimov.MovieExtractorFromPath(path)
 
-	if err == nil {
-		return MakeMovieExtractorFrameSource(ext)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil, err
+  return ext.FrameSource(), nil
+	
 }

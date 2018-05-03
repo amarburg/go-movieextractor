@@ -3,12 +3,12 @@ package frameset
 import (
 	"fmt"
 	"github.com/amarburg/go-frameset/multimov"
-	"github.com/amarburg/go-lazyquicktime"
+	"github.com/amarburg/go-frameset/movieextractor"
 	"os"
 	"path/filepath"
 )
 
-func (set FrameSet) MovieExtractor() (lazyquicktime.MovieExtractor, error) {
+func (set FrameSet) MovieExtractor() (movieextractor.MovieExtractor, error) {
 	// Create the source
 
 	source := os.ExpandEnv(set.Source)

@@ -64,41 +64,41 @@ func (mm MultiMov) ExtractFrame(frame uint64) (image.Image, error) {
 }
 
 // ExtractFrame extracts the specified frame from a MultiMov
-func (mm MultiMov) ExtractFramePerf(frame uint64) (image.Image, lazyquicktime.LQTPerformance, error) {
-	hash, offset, err := mm.Offset(frame)
-
-	if err != nil {
-		return image.NewGray(image.Rect(0, 0, 0, 0)), lazyquicktime.LQTPerformance{}, err
-	}
-
-	mov, has := mm.Movies[hash]
-
-	if !has {
-		return image.NewGray(image.Rect(0, 0, 0, 0)), lazyquicktime.LQTPerformance{}, fmt.Errorf("Error looking up movie %x in table", hash)
-	}
-
-	if mov.lqt == nil {
-		movFile := mm.MovPath(hash)
-
-		if _, err := os.Stat(movFile); os.IsNotExist(err) {
-			return nil, lazyquicktime.LQTPerformance{}, err
-		}
-
-		log.Printf("Opening movie file: %s", movFile)
-
-		fs, err := lazyfs.OpenLocalFile(movFile)
-		if err != nil {
-			return nil, lazyquicktime.LQTPerformance{}, err
-		}
-
-		lqt, err := lazyquicktime.LoadMovMetadata(fs)
-		if err != nil {
-			return nil, lazyquicktime.LQTPerformance{}, err
-		}
-
-		mov.lqt = lqt
-		mm.Movies[hash] = mov
-	}
-
-	return mov.lqt.ExtractFramePerf(frame - offset)
-}
+// func (mm MultiMov) ExtractFramePerf(frame uint64) (image.Image, lazyquicktime.LQTPerformance, error) {
+// 	hash, offset, err := mm.Offset(frame)
+//
+// 	if err != nil {
+// 		return image.NewGray(image.Rect(0, 0, 0, 0)), lazyquicktime.LQTPerformance{}, err
+// 	}
+//
+// 	mov, has := mm.Movies[hash]
+//
+// 	if !has {
+// 		return image.NewGray(image.Rect(0, 0, 0, 0)), lazyquicktime.LQTPerformance{}, fmt.Errorf("Error looking up movie %x in table", hash)
+// 	}
+//
+// 	if mov.lqt == nil {
+// 		movFile := mm.MovPath(hash)
+//
+// 		if _, err := os.Stat(movFile); os.IsNotExist(err) {
+// 			return nil, lazyquicktime.LQTPerformance{}, err
+// 		}
+//
+// 		log.Printf("Opening movie file: %s", movFile)
+//
+// 		fs, err := lazyfs.OpenLocalFile(movFile)
+// 		if err != nil {
+// 			return nil, lazyquicktime.LQTPerformance{}, err
+// 		}
+//
+// 		lqt, err := lazyquicktime.LoadMovMetadata(fs)
+// 		if err != nil {
+// 			return nil, lazyquicktime.LQTPerformance{}, err
+// 		}
+//
+// 		mov.lqt = lqt
+// 		mm.Movies[hash] = mov
+// 	}
+//
+// 	return mov.lqt.ExtractFramePerf(frame - offset)
+// }

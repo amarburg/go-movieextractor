@@ -1,0 +1,14 @@
+package movieextractor
+
+import (
+	"image"
+	"time"
+)
+
+// MovieExtractor is the abstract interface to a quicktime movie.
+type MovieExtractor interface {
+	NumFrames() uint64
+	Duration() time.Duration
+	ExtractFrame(frame uint64) (image.Image, error)
+	//ExtractFramePerf(frame uint64) (image.Image, LQTPerformance, error)
+}

@@ -14,13 +14,13 @@ import (
 
 func expectMovLength(t *testing.T, mov *MultiMov, expected int) {
 	if mov.NumMovies() != expected {
-		t.Fatalf("Expected MultiMov to have %d movies, actually had %d", mov.NumMovies(), expected)
+		t.Fatalf("Expected MultiMov to have %d movies, actually had %d", expected, mov.NumMovies())
 	}
 }
 
 func expectNumFrames(t *testing.T, mov *MultiMov, expected uint64) {
 	if mov.NumFrames() != expected {
-		t.Fatalf("Expected MultiMov to have %d frames, actually had %d", mov.NumFrames(), expected)
+		t.Fatalf("Expected MultiMov to have %d frames, actually had %d", expected, mov.NumFrames())
 	}
 }
 

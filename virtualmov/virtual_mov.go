@@ -1,20 +1,19 @@
 package virtualmov
 
 import (
-  	"github.com/amarburg/go-lazyquicktime"
+    "github.com/amarburg/go-frameset/movieextractor"
     "time"
     "image"
     "fmt"
 )
 
-
 type VirtualMov struct {
   Offset, Length    uint64
-  Mov               lazyquicktime.MovieExtractor
+  Mov               movieextractor.MovieExtractor
 }
 
 
-func CreateVirtualMov( mov lazyquicktime.MovieExtractor, offset uint64, length uint64 ) (VirtualMov, error) {
+func CreateVirtualMov( mov movieextractor.MovieExtractor, offset uint64, length uint64 ) (VirtualMov, error) {
   // l := uint64(length)
   // if length < 0 {
   //   l = mov.NumFrames() - uint64(offset)

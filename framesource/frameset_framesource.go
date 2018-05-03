@@ -3,17 +3,18 @@ package framesource
 import (
 	"fmt"
 	"github.com/amarburg/go-frameset/frameset"
-	"github.com/amarburg/go-lazyquicktime"
+	"github.com/amarburg/go-frameset/movieextractor"
 	"image"
 	"io"
 )
 
 type FrameSetFrameSource struct {
 	*frameset.FrameSet
-	Movie         lazyquicktime.MovieExtractor
+	Movie         movieextractor.MovieExtractor
 	chunkIdx      int
 	frameIdx      int
 	segmentOffset uint64
+	totalFrames   uint64
 }
 
 func MakeFrameSetFrameSource(set *frameset.FrameSet) (*FrameSetFrameSource, error) {
@@ -51,6 +52,7 @@ func (source *FrameSetFrameSource) Valid() error {
 func (source *FrameSetFrameSource) Advance() {
 	source.frameIdx++
 	source.segmentOffset++
+	source.totalFrames++
 
 	chunk := source.FrameSet.Chunks[source.chunkIdx]
 
@@ -87,4 +89,8 @@ func (source *FrameSetFrameSource) Next() (image.Image, uint64, error) {
 
 	img, err := source.Movie.ExtractFrame(frame)
 	return img, frame, err
+}
+
+func (source *FrameSetFrameSource) FrameNum() uint64 {
+	return source.totalFrames
 }

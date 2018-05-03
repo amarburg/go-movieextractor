@@ -113,9 +113,6 @@ func (p UInt64Slice) Len() int           { return len(p) }
 func (p UInt64Slice) Less(i, j int) bool { return p[i] < p[j] }
 func (p UInt64Slice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
-
-
-
 func (fs *FrameSet) ChunkNames() []string {
 	var names []string
 	for _,chunk := range fs.Chunks {
