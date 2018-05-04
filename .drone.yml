@@ -5,6 +5,7 @@ workspace:
 pipeline:
   build:
     image: amarburg/golang-ffmpeg
+    pull: true
     commands:
       - go get -t -v
       - go build
