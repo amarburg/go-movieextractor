@@ -6,7 +6,7 @@ pipeline:
   build:
     image: amarburg/golang-ffmpeg
     commands:
-      - go get
+      - go get -t -u -v
       - go build
       - go test
 
