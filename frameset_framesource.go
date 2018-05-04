@@ -1,23 +1,21 @@
-package framesource
+package movieset
 
 import (
 	"fmt"
-	"github.com/amarburg/go-frameset/frameset"
-	"github.com/amarburg/go-frameset/movieextractor"
 	"image"
 	"io"
 )
 
 type FrameSetFrameSource struct {
-	*frameset.FrameSet
-	Movie         movieextractor.MovieExtractor
+	*FrameSet
+	Movie         MovieExtractor
 	chunkIdx      int
 	frameIdx      int
 	segmentOffset uint64
 	totalFrames   uint64
 }
 
-func MakeFrameSetFrameSource(set *frameset.FrameSet) (*FrameSetFrameSource, error) {
+func MakeFrameSetFrameSource(set *FrameSet) (*FrameSetFrameSource, error) {
 
 	mm, err := set.MovieExtractor()
 

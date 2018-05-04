@@ -1,14 +1,12 @@
-package frameset
+package movieset
 
 import (
 	"fmt"
-	"github.com/amarburg/go-frameset/multimov"
-	"github.com/amarburg/go-frameset/movieextractor"
 	"os"
 	"path/filepath"
 )
 
-func (set FrameSet) MovieExtractor() (movieextractor.MovieExtractor, error) {
+func (set FrameSet) MovieExtractor() (MovieExtractor, error) {
 	// Create the source
 
 	source := os.ExpandEnv(set.Source)
@@ -22,6 +20,6 @@ func (set FrameSet) MovieExtractor() (movieextractor.MovieExtractor, error) {
 		source = filepath.Clean(filepath.Join(filepath.Dir(set.filepath), source))
 	}
 
-	return multimov.MovieExtractorFromPath(source)
+	return MovieExtractorFromPath(source)
 
 }

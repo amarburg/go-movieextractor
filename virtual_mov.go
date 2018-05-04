@@ -1,7 +1,6 @@
-package virtualmov
+package movieset
 
 import (
-    "github.com/amarburg/go-frameset/movieextractor"
     "time"
     "image"
     "fmt"
@@ -9,11 +8,11 @@ import (
 
 type VirtualMov struct {
   Offset, Length    uint64
-  Mov               movieextractor.MovieExtractor
+  Mov               MovieExtractor
 }
 
 
-func CreateVirtualMov( mov movieextractor.MovieExtractor, offset uint64, length uint64 ) (VirtualMov, error) {
+func CreateVirtualMov( mov MovieExtractor, offset uint64, length uint64 ) (VirtualMov, error) {
   // l := uint64(length)
   // if length < 0 {
   //   l = mov.NumFrames() - uint64(offset)

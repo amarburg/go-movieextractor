@@ -1,14 +1,13 @@
-package multimov
+package movieset
 
 import (
 	"fmt"
-	"github.com/amarburg/go-frameset/movieextractor"
 	"github.com/amarburg/go-lazyfs"
 	"github.com/amarburg/go-lazyquicktime"
 	"path/filepath"
 )
 
-func MovieExtractorFromPath(path string) (movieextractor.MovieExtractor, error) {
+func MovieExtractorFromPath(path string) (MovieExtractor, error) {
 
 	if filepath.Ext(path) == ".mov" {
 

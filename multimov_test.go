@@ -1,4 +1,4 @@
-package multimov
+package movieset
 
 import (
 	"encoding/json"

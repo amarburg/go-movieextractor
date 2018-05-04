@@ -1,4 +1,4 @@
-package frameset
+package movieset
 
 import (
 	"github.com/amarburg/go-lazyfs-testfiles/frameset"
@@ -15,9 +15,9 @@ func TestLoadGoodJson(t *testing.T) {
 
 	const NumChunks = frameset_testfiles.GoodFrameSetJsonChunks
 	FrameLengths := []int{3, 0, 2, 0, 0}
-	ChunkMins := []uint64{1, 20, 30, 50, 60}
-	ChunkStarts := []uint64{0, 20, 0, 50, 60}
-	ChunkEnds := []uint64{0, 30, 0, 60, 65}
+	ChunkMins    := []uint64{1, 20, 30, 50, 60}
+	ChunkStarts  := []uint64{0, 20, 0, 50, 60}
+	ChunkEnds    := []uint64{0, 30, 0, 60, 65}
 
 	if len(set.Chunks) != NumChunks {
 		t.Errorf("Unexpected number of chunks %d != %d", len(set.Chunks), NumChunks)

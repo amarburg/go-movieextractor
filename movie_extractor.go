@@ -1,4 +1,4 @@
-package movieextractor
+package movieset
 
 import (
 	"image"

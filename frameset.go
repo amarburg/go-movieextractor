@@ -1,4 +1,4 @@
-package frameset
+package movieset
 
 import (
 	"encoding/json"
@@ -6,8 +6,6 @@ import (
 	"log"
 	"os"
 	"sort"
-	"github.com/amarburg/go-frameset/virtualmov"
-	"github.com/amarburg/go-frameset/multimov"
 )
 
 type FrameSet struct {
@@ -121,19 +119,19 @@ func (fs *FrameSet) ChunkNames() []string {
 	return names
 }
 
-func (fs *FrameSet) MovFromChunk(name string) (virtualmov.VirtualMov, error) {
+func (fs *FrameSet) MovFromChunk(name string) (VirtualMov, error) {
 	for _,chunk := range fs.Chunks {
 		if chunk.Name == name {
 
-			ex,err := multimov.MovieExtractorFromPath( fs.Source )
+			ex,err := MovieExtractorFromPath( fs.Source )
 
 			if err != nil {
-					return virtualmov.VirtualMov{}, err
+					return VirtualMov{}, err
 			}
 
-			return virtualmov.CreateVirtualMov(ex, chunk.Start, chunk.End)
+			return CreateVirtualMov(ex, chunk.Start, chunk.End)
 		}
 	}
 
-		return virtualmov.VirtualMov{}, fmt.Errorf("Couldn't find chunk \"%s\"", name )
+		return VirtualMov{}, fmt.Errorf("Couldn't find chunk \"%s\"", name )
 }

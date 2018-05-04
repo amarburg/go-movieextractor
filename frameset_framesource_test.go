@@ -1,7 +1,6 @@
-package framesource
+package movieset
 
 import (
-	"github.com/amarburg/go-frameset/frameset"
 	"github.com/amarburg/go-lazyfs-testfiles/frameset"
 	"io"
 	"testing"
