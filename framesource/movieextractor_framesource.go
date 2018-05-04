@@ -2,18 +2,18 @@ package framesource
 
 import (
 	"fmt"
-	"github.com/amarburg/go-lazyquicktime"
+	"github.com/amarburg/go-frameset/movieextractor"
 	"image"
 )
 
 // Thin wrapper around a MovieExtractor which implements FrameSource
 type MovieExtractorFrameSource struct {
-	lazyquicktime.MovieExtractor
+	movieextractor.MovieExtractor
 	frameNum uint64
 }
 
 
-func (ext lazyquicktime.MovieExtractor) FrameSource() (*MovieExtractorFrameSource, error) {
+func (ext movieextractor.MovieExtractor) FrameSource() (*MovieExtractorFrameSource, error) {
 	return &MovieExtractorFrameSource{
 		MovieExtractor: ext,
 		frameNum:       1,
