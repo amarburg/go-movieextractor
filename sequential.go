@@ -24,7 +24,7 @@ func OpenSequential(path string) (Sequential, error) {
 		return nil, err
 	}
 
-	ext, err := MovieExtractorFromPath(path)
+	ext, err := OpenMovieExtractor(path)
 
 	if err != nil {
 		return nil, err

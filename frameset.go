@@ -124,7 +124,7 @@ func (fs *FrameSet) MovFromChunk(name string) (VirtualMov, error) {
 	for _,chunk := range fs.Chunks {
 		if chunk.Name == name {
 
-			ex,err := MovieExtractorFromPath( fs.Source )
+			ex,err := OpenMovieExtractor( fs.Source )
 
 			if err != nil {
 					return VirtualMov{}, err
@@ -153,6 +153,6 @@ func (set FrameSet) MovieExtractor() (MovieExtractor, error) {
 		source = filepath.Clean(filepath.Join(filepath.Dir(set.filepath), source))
 	}
 
-	return MovieExtractorFromPath(source)
+	return OpenMovieExtractor(source)
 
 }

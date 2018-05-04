@@ -16,6 +16,15 @@ var MultiMovVersion = "0.1"
 // A MovHash is a 32-bit hash handle to a given movie
 type MovHash uint32
 
+// A SequenceElement represents one movie within a sequence
+type SequenceElement struct {
+	FrameOffset uint64
+	Hash        MovHash
+}
+
+// Sequence is a convenience type representing a slice of SequenceElements
+type Sequence []SequenceElement
+
 // MultiMov is the top-level container representing a MultiMov
 type MultiMov struct {
 	Version  string
