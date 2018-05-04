@@ -4,7 +4,7 @@ workspace:
 
 pipeline:
   build:
-    image: amarburg/golang-ffmpeg
+    image: amarburg/golang-ffmpeg:stretch-1.10
     pull: true
     commands:
       - go get -t -v
