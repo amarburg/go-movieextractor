@@ -7,6 +7,11 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"image"
+	"time"
+	"log"
+	"github.com/amarburg/go-lazyfs"
+	 "github.com/amarburg/go-lazyquicktime"
 )
 
 // MultiMovVersion is the semantic version string for the current MultiMov
@@ -152,4 +157,57 @@ func (mm MultiMov) MovPath(hash MovHash) string {
 
 	return filepath.Clean(filepath.Join(mm.BaseDir, mov.Relapath))
 
+}
+
+//=== Functions that allow MultiMov to comply with the MovieExtractor Interface
+
+// Duration calculates the total continuous duration within a MultiMov.
+// The sum of all movie durations, does account for time gaps
+func (mm MultiMov) Duration() time.Duration {
+	var out time.Duration
+	for _, h := range mm.Sequence {
+		out += mm.Movies[h.Hash].Duration
+	}
+
+	return out
+}
+
+// ExtractFrame extracts the specified frame from a MultiMov
+func (mm MultiMov) ExtractFrame(frame uint64) (image.Image, error) {
+	hash, offset, err := mm.Offset(frame)
+
+	if err != nil {
+		return image.NewGray(image.Rect(0, 0, 0, 0)), err
+	}
+
+	mov, has := mm.Movies[hash]
+
+	if !has {
+		return image.NewGray(image.Rect(0, 0, 0, 0)), fmt.Errorf("Error looking up movie %x in table", hash)
+	}
+
+	if mov.lqt == nil {
+		movFile := mm.MovPath(hash)
+
+		if _, err := os.Stat(movFile); os.IsNotExist(err) {
+			return nil, err
+		}
+
+		log.Printf("Opening movie file: %s", movFile)
+
+		fs, err := lazyfs.OpenLocalFile(movFile)
+		if err != nil {
+			return nil, err
+		}
+
+		lqt, err := lazyquicktime.LoadMovMetadata(fs)
+		if err != nil {
+			return nil, err
+		}
+
+		mov.lqt = lqt
+		mm.Movies[hash] = mov
+	}
+
+	return mov.lqt.ExtractFrame(frame - offset)
 }
