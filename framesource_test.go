@@ -8,7 +8,7 @@ import (
 
 func TestFrameSourceGoodJson(t *testing.T) {
 
-	source, err := MakeFrameSourceFromPath(frameset_testfiles.GoodMultiMovJson)
+	source, err := FrameSourceFromPath(frameset_testfiles.GoodFrameSetJson)
 
 	if err != nil {
 		t.Errorf("Unable to make frame source from good.json: %s", err)
@@ -20,7 +20,7 @@ func TestFrameSourceGoodJson(t *testing.T) {
 
 func TestFrameSourceMultimov(t *testing.T) {
 
-	source, err := MakeFrameSourceFromPath(multimov_testfiles.FourMovMultiMovJson)
+	source, err := FrameSourceFromPath(multimov_testfiles.FourMovMultiMovJson)
 
 	if err != nil {
 		t.Errorf("Unable to make frame source from %s: %s", multimov_testfiles.FourMovMultiMovJson, err)

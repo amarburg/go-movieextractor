@@ -27,14 +27,15 @@ func goodFrameSourceTest(t *testing.T, source FrameSource) {
 		// TODO.  Check that frames are valid.
 	}
 
-	if frames != frameset_testfiles.GoodMultiMovJsonFrames {
-		t.Errorf("Didn't get as many frames as I expected %d, rather than %d", frames, frameset_testfiles.GoodMultiMovJsonFrames)
+	if frames != frameset_testfiles.GoodFrameSetJsonFrames {
+		t.Errorf("Didn't get as many frames as I expected %d, rather than %d",
+							frameset_testfiles.GoodFrameSetJsonFrames, frames)
 	}
 }
 
 func TestFrameSetFrameSourceGoodJson(t *testing.T) {
 
-	set, err := frameset.LoadFrameSet(frameset_testfiles.GoodMultiMovJson)
+	set, err := LoadFrameSet(frameset_testfiles.GoodFrameSetJson)
 
 	if err != nil {
 		t.Errorf("Unable to load good.json: %s", err)
