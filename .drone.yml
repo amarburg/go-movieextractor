@@ -1,8 +1,12 @@
+workspace:
+  base: /go
+  path: src/github.com/amarburg/go-movieset
+
 pipeline:
   build:
     image: golang
     commands:
-      - go get 
+      - go get
       - go build
       - go test
 
