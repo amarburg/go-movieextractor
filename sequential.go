@@ -4,21 +4,20 @@ import (
 	"image"
 )
 
-//
-type FrameSource interface {
+// Interface
+type Sequential interface {
 	Next() (image.Image, uint64, error)
 	//FrameNum() (uint64)
 }
 
-func FrameSourceFromPath(path string) (FrameSource, error) {
+func OpenSequential(path string) (Sequential, error) {
 
 	// Is it a Frameset, a multimov or a movie?
 
 	// Check if it parses as a FrameSet
 	set, err := LoadFrameSet(path)
-
 	if err == nil {
-		return MakeFrameSetFrameSource(set)
+		return MakeFrameSetSequential(set)
 	}
 
 	if _, ok := err.(NotAFrameSetError); !ok {
@@ -31,6 +30,6 @@ func FrameSourceFromPath(path string) (FrameSource, error) {
 		return nil, err
 	}
 
-  return FrameSourceFromMovieExtractor(ext)
+  return MakeMovieSequential(ext)
 
 }

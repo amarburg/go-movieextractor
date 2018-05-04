@@ -1,3 +1,3 @@
-# go-frameset
+# go-movieset
 
-A set of abstractions that sit on top of the [](movie-extractor) interface.  
+A layered set of abstractions 

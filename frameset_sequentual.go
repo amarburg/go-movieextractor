@@ -6,7 +6,7 @@ import (
 	"io"
 )
 
-type FrameSetFrameSource struct {
+type FrameSetSequential struct {
 	*FrameSet
 	Movie         MovieExtractor
 	chunkIdx      int
@@ -15,21 +15,21 @@ type FrameSetFrameSource struct {
 	totalFrames   uint64
 }
 
-func MakeFrameSetFrameSource(set *FrameSet) (*FrameSetFrameSource, error) {
+func MakeFrameSetSequential(set *FrameSet) (*FrameSetSequential, error) {
 
 	mm, err := set.MovieExtractor()
 
 	if err != nil {
-		return &FrameSetFrameSource{}, err
+		return &FrameSetSequential{}, err
 	}
 
-	return &FrameSetFrameSource{
+	return &FrameSetSequential{
 		FrameSet: set,
 		Movie:    mm,
 	}, nil
 }
 
-func (source *FrameSetFrameSource) Valid() error {
+func (source *FrameSetSequential) Valid() error {
 	if source.chunkIdx >= len(source.FrameSet.Chunks) {
 		return io.EOF
 	}
@@ -47,7 +47,7 @@ func (source *FrameSetFrameSource) Valid() error {
 	return nil
 }
 
-func (source *FrameSetFrameSource) Advance() {
+func (source *FrameSetSequential) Advance() {
 	source.frameIdx++
 	source.segmentOffset++
 	source.totalFrames++
@@ -69,7 +69,7 @@ func (source *FrameSetFrameSource) Advance() {
 
 }
 
-func (source *FrameSetFrameSource) Next() (image.Image, uint64, error) {
+func (source *FrameSetSequential) Next() (image.Image, uint64, error) {
 	if err := source.Valid(); err != nil {
 		return nil, 0, err
 	}
@@ -89,6 +89,6 @@ func (source *FrameSetFrameSource) Next() (image.Image, uint64, error) {
 	return img, frame, err
 }
 
-func (source *FrameSetFrameSource) FrameNum() uint64 {
-	return source.totalFrames
-}
+// func (source *FrameSetSequential) FrameNum() uint64 {
+// 	return source.totalFrames
+// }
