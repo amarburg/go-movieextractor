@@ -1,0 +1,15 @@
+pipeline:
+  build:
+    image: golang
+    commands:
+      - go get ...
+      - go build ...
+      - go test ...
+
+  slack:
+    image: plugins/slack
+    secrets: [ slack_webhook ]
+    when:
+      status:
+        - success
+        - failure
