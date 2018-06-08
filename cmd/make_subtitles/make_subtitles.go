@@ -34,7 +34,7 @@ func main() {
 	offset := uint64(1)
 
 	for _, seq := range mm.Sequence {
-		mov, _ := mm.Movies[seq.Hash]
+		mov := mm.Movies[seq.Hash]
 		basename := strings.TrimSuffix(filepath.Base(mov.ShortName), filepath.Ext(mov.ShortName))
 		srtFile := filepath.Clean(filepath.Join(outdir, fmt.Sprintf("%s.srt", basename)))
 

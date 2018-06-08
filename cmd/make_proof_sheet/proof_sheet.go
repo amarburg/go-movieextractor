@@ -50,11 +50,11 @@ func runProofSheet(cmd *cobra.Command, args []string) {
 	}
 
 	outpath := filepath.Join(".", outdir)
-	os.MkdirAll(outpath, os.ModePerm)
+	_ = os.MkdirAll(outpath, os.ModePerm)
 	imagedir := filepath.Join(outpath, "images")
-	os.MkdirAll(imagedir, os.ModePerm)
+	_ = os.MkdirAll(imagedir, os.ModePerm)
 	thumbdir := filepath.Join(outpath, "thumbs")
-	os.MkdirAll(thumbdir, os.ModePerm)
+	_ = os.MkdirAll(thumbdir, os.ModePerm)
 
 	thumbnailFileName := func(idx uint64) string {
 		return filepath.Join(thumbdir, fmt.Sprintf("thumb_%08d.png", idx))
@@ -74,15 +74,15 @@ func runProofSheet(cmd *cobra.Command, args []string) {
 
 		img, _ := mm.ExtractFrame(frameNum)
 		imgFile, _ := os.Create(imageFileName(frameNum))
-		png.Encode(imgFile, img)
+		_ = png.Encode(imgFile, img)
 		imgFile.Close()
 
 		thumb := image.NewRGBA(image.Rect(0, 0,
 			int(float32(img.Bounds().Dx())*scaleFactor),
 			int(float32(img.Bounds().Dy())*scaleFactor)))
-		rez.Convert(thumb, img, rez.NewBicubicFilter())
+		_ = rez.Convert(thumb, img, rez.NewBicubicFilter())
 		thumbFile, _ := os.Create(thumbnailFileName(frameNum))
-		png.Encode(thumbFile, thumb)
+		_ = png.Encode(thumbFile, thumb)
 		thumbFile.Close()
 	}
 
@@ -105,7 +105,7 @@ func runProofSheet(cmd *cobra.Command, args []string) {
 	var funcs = template.FuncMap{"framesIn": func(seq movieset.SequenceElement) []uint64 {
 		//log.Printf("%T %#v %d", hash, hash, count)
 		start := uint64(math.Trunc(float64(seq.FrameOffset)/float64(step))) * step
-		mov, _ := mm.Movies[seq.Hash]
+		mov := mm.Movies[seq.Hash]
 		stop := uint64(math.Trunc(float64(seq.FrameOffset+mov.NumFrames)/float64(step))) * step
 
 		//out := make([]imgcelldata, 0, int(math.Trunc(float64(stop-start)/float64(step))))

@@ -40,7 +40,7 @@ func main() {
 		log.Fatalf("Unable to open source \"%s\"", source)
 	}
 
-	log.Printf("Extracting %u frames from %s", set.NumFrames, set.Source)
+	log.Printf("Extracting %d frames from %s", set.NumFrames, set.Source)
 
 	if set.ImageName == "" {
 		set.ImageName = "image_%06d.png"
@@ -53,13 +53,13 @@ func main() {
 
 	pattern := makeImageFilePattern(set.ImageName)
 
-	os.MkdirAll(filepath.Join(outdir, imageDir), os.ModePerm)
+	_ = os.MkdirAll(filepath.Join(outdir, imageDir), os.ModePerm)
 	// rootPattern := pattern.SetBaseDir(filepath.Join(outdir, imageDir))
 	// extractSetFrom(extractor, set.Frames, rootPattern, force, doDelete)
 
 	for _, chunk := range set.Chunks {
 		chunkdir := filepath.Join(outdir, chunk.Name, imageDir)
-		os.MkdirAll(chunkdir, os.ModePerm)
+		_ = os.MkdirAll(chunkdir, os.ModePerm)
 
 		chunkPattern := pattern.SetBaseDir(chunkdir)
 		extractSetFrom(extractor, chunk.Frames, chunkPattern, force, doDelete)
@@ -91,7 +91,7 @@ func extractSetFrom(ext movieset.MovieExtractor, frames []uint64,
 	pattern imageFilePattern, force bool, doDelete bool) {
 
 	var existingFiles []string
-	if force == false {
+	if !force {
 		existingFiles = pattern.ExistingFiles()
 	}
 
@@ -100,13 +100,13 @@ func extractSetFrom(ext movieset.MovieExtractor, frames []uint64,
 
 		var found bool
 		existingFiles, found = removeFromSlice(outpath, existingFiles)
-		if found == true {
+		if found {
 			continue
 		}
 
 		start := time.Now()
 		img, err := ext.ExtractFrame(frame)
-		log.Printf("Extraction took %s", (time.Now().Sub(start)).String())
+		log.Printf("Extraction took %s", time.Since(start).String())
 
 		if err != nil {
 			log.Fatalf("Unable to extract frame: %s", err)
@@ -135,7 +135,7 @@ func writeImage(img image.Image, path string) {
 		log.Fatalf("Error creating image file \"%s\": %s", path, err)
 	}
 
-	png.Encode(outfile, img)
+	_ =png.Encode(outfile, img)
 }
 
 func removeFromSlice(a string, list []string) (out []string, found bool) {

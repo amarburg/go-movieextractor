@@ -64,7 +64,7 @@ func main() {
 
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
-	encoder.Encode(mm)
+	_ = encoder.Encode(mm)
 }
 
 func makeLazyQuicktime(path string) (*lazyquicktime.LazyQuicktime, error) {

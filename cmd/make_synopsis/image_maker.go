@@ -50,7 +50,7 @@ func (im *ImageMaker) MakeImages(frameNum uint64) Images {
 
 		img, _ = im.mm.ExtractFrame(frameNum)
 		imgFile, _ := os.Create(imgFilename)
-		png.Encode(imgFile, img)
+		_ = png.Encode(imgFile, img)
 		imgFile.Close()
 	} else {
 		log.Printf("Skipping %s", imgFilename)
@@ -76,9 +76,9 @@ func (im *ImageMaker) MakeImages(frameNum uint64) Images {
 			thumb := image.NewRGBA(image.Rect(0, 0,
 				int(float32(img.Bounds().Dx())*im.scale),
 				int(float32(img.Bounds().Dy())*im.scale)))
-			rez.Convert(thumb, img, rez.NewBicubicFilter())
+			_ = rez.Convert(thumb, img, rez.NewBicubicFilter())
 			thumbFile, _ := os.Create(thumbFilename)
-			png.Encode(thumbFile, thumb)
+			_ = png.Encode(thumbFile, thumb)
 			thumbFile.Close()
 		}
 	}

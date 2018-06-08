@@ -18,7 +18,7 @@ type DirOutTree struct {
 }
 
 func NewDirOutTree(basedir string) DirOutTree {
-	os.MkdirAll(basedir, os.ModePerm)
+	_ = os.MkdirAll(basedir, os.ModePerm)
 
 	return DirOutTree{
 		basedir: basedir,
@@ -33,7 +33,7 @@ func (ot DirOutTree) thumbDir() string {
 	path := filepath.Join(ot.basedir, "thumbs")
 
 	// eager-create directory
-	os.MkdirAll(path, os.ModePerm)
+	_ = os.MkdirAll(path, os.ModePerm)
 
 	return path
 }
@@ -42,7 +42,7 @@ func (ot DirOutTree) imageDir() string {
 	path := filepath.Join(ot.basedir, "images")
 
 	// eager-create directory
-	os.MkdirAll(path, os.ModePerm)
+	_ = os.MkdirAll(path, os.ModePerm)
 
 	return path
 }

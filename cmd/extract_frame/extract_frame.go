@@ -79,8 +79,11 @@ func extractAndSave(ext movieset.MovieExtractor, frame uint64, outfile string) {
 func writeImage(img image.Image, path string) {
 	outfile, err := os.Create(path)
 	if err != nil {
-		log.Fatalf("Error creating image file \"%s\": %s", path, err)
+		log.Fatalf("Error opening image file \"%s\": %s", path, err)
 	}
 
-	png.Encode(outfile, img)
+	err = png.Encode(outfile, img)
+	if err != nil {
+		log.Fatalf("Error encoding image file \"%s\": %s", path, err)
+	}
 }
