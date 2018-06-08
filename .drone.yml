@@ -7,7 +7,7 @@ pipeline:
     image: amarburg/golang-ffmpeg:latest-ci
     pull: true
     commands:
-      - go get -t -v
+      - go get -t -v . ./cmd/...
       - golangci-lint run
       - go build . ./cmd/...
       - go test
