@@ -15,6 +15,7 @@ pipeline:
     image: amarburg/golang-ffmpeg:latest-ci
     pull: true
     commands:
+      - ls /go/bin
       - golangci-lint run
 
   slack:
