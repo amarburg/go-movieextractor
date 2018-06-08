@@ -4,7 +4,7 @@ workspace:
 
 pipeline:
   build:
-    image: amarburg/golang-ffmpeg:stretch-1.10
+    image: amarburg/golang-ffmpeg:latest
     pull: true
     commands:
       - go get -t -v
@@ -13,6 +13,7 @@ pipeline:
 
   lint:
     image: amarburg/golang-ffmpeg:latest-ci
+    pull: true
     commands:
       - golangci-lint run
 
