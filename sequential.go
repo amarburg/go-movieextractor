@@ -30,6 +30,6 @@ func OpenSequential(path string) (Sequential, error) {
 		return nil, err
 	}
 
-  return MakeMovieSequential(ext)
+	return MakeMovieSequential(ext)
 
 }

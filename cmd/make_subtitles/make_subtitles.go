@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/amarburg/go-multimov"
+	"github.com/amarburg/go-movieset"
 	"log"
 	"math"
 	"os"
@@ -23,7 +23,7 @@ func main() {
 	}
 	source = flag.Args()[0]
 
-	mm, err := multimov.LoadMultiMov(source)
+	mm, err := movieset.LoadMultiMov(source)
 	if err != nil {
 		log.Fatalf("Unable to load MultiMov from \"%s\": %s", source, err)
 	}

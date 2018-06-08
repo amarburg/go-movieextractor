@@ -6,7 +6,7 @@ import (
 	"github.com/amarburg/go-lazyfs"
 	"github.com/amarburg/go-lazyquicktime"
 	// "github.com/amarburg/go-quicktime"
-	"github.com/amarburg/go-multimov"
+	"github.com/amarburg/go-movieset"
 	"image"
 	"image/png"
 	"log"
@@ -49,7 +49,7 @@ func main() {
 
 	case ".json":
 
-		mm, err := multimov.LoadMultiMov(source)
+		mm, err := movieset.LoadMultiMov(source)
 		if err != nil {
 			log.Fatalf("Error opening multimov file \"%s\": %s", source, err)
 		}
@@ -66,7 +66,7 @@ func main() {
 
 }
 
-func extractAndSave(ext lazyquicktime.MovieExtractor, frame uint64, outfile string) {
+func extractAndSave(ext movieset.MovieExtractor, frame uint64, outfile string) {
 	img, err := ext.ExtractFrame(frame)
 
 	if err != nil {

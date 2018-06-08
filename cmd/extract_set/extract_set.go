@@ -3,8 +3,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"github.com/amarburg/go-frameset"
-	"github.com/amarburg/go-lazyquicktime"
+	"github.com/amarburg/go-movieset"
 	"image"
 	"image/png"
 	"log"
@@ -35,14 +34,17 @@ func main() {
 
 	// Load FrameSet JSON file
 	set := loadFrameSet(source)
+	extractor, err := set.MovieExtractor()
 
-	extractor := makeMovieExtractor(set, basedir)
+	if err != nil {
+		log.Fatalf("Unable to open source \"%s\"", source)
+	}
 
-	log.Printf("Extracting %d frames from %s", len(set.Frames), set.Source)
+	log.Printf("Extracting %u frames from %s", set.NumFrames, set.Source)
 
 	if set.ImageName == "" {
-		log.Print("No image name specified, using default \"image_%06d.png\"")
 		set.ImageName = "image_%06d.png"
+		log.Printf("No image name specified, using default \"%s\"\n", set.ImageName)
 	}
 
 	if outdir == "" {
@@ -52,27 +54,27 @@ func main() {
 	pattern := makeImageFilePattern(set.ImageName)
 
 	os.MkdirAll(filepath.Join(outdir, imageDir), os.ModePerm)
-	rootPattern := pattern.SetBaseDir(filepath.Join(outdir, imageDir))
-	extractSetFrom(extractor, set.Frames, rootPattern, force, doDelete)
+	// rootPattern := pattern.SetBaseDir(filepath.Join(outdir, imageDir))
+	// extractSetFrom(extractor, set.Frames, rootPattern, force, doDelete)
 
-	for name, chunk := range set.Chunks {
-		chunkdir := filepath.Join(outdir, name, imageDir)
+	for _, chunk := range set.Chunks {
+		chunkdir := filepath.Join(outdir, chunk.Name, imageDir)
 		os.MkdirAll(chunkdir, os.ModePerm)
 
 		chunkPattern := pattern.SetBaseDir(chunkdir)
-		extractSetFrom(extractor, chunk, chunkPattern, force, doDelete)
+		extractSetFrom(extractor, chunk.Frames, chunkPattern, force, doDelete)
 	}
 
 }
 
-func loadFrameSet(setFile string) FrameSet.FrameSet {
+func loadFrameSet(setFile string) movieset.FrameSet {
 	// Parse the source
 	fs, err := os.Open(setFile)
 	if err != nil {
 		log.Fatalf("Couldn't open set file \"%s\": %s", setFile, err)
 	}
 
-	var set FrameSet.FrameSet
+	var set movieset.FrameSet
 
 	decoder := json.NewDecoder(fs)
 	err = decoder.Decode(&set)
@@ -85,7 +87,7 @@ func loadFrameSet(setFile string) FrameSet.FrameSet {
 }
 
 //
-func extractSetFrom(ext lazyquicktime.MovieExtractor, frames []uint64,
+func extractSetFrom(ext movieset.MovieExtractor, frames []uint64,
 	pattern imageFilePattern, force bool, doDelete bool) {
 
 	var existingFiles []string

@@ -2,8 +2,7 @@ package main
 
 import (
 	//"flag"
-	"github.com/amarburg/go-frameset"
-	"github.com/amarburg/go-multimov"
+	"github.com/amarburg/go-movieset"
 	"github.com/spf13/cobra"
 	"html/template"
 	"log"
@@ -30,14 +29,14 @@ func runSynopsis(cmd *cobra.Command, args []string) {
 
 	source := args[0]
 
-	set, err := frameset.LoadFrameSet(source)
+	set, err := movieset.LoadFrameSet(source)
 	if err != nil {
 		log.Fatalf("Unable to load FrameSet from \"%s\": %s", source, err)
 	}
 
 	// Construct multimov from image set
 	multimovPath := os.ExpandEnv(set.Source)
-	mm, err := multimov.LoadMultiMov(multimovPath)
+	mm, err := movieset.LoadMultiMov(multimovPath)
 	if err != nil {
 		log.Fatalf("Unable to load MultiMov from \"%s\": %s", multimovPath, err)
 	}
@@ -50,17 +49,17 @@ func runSynopsis(cmd *cobra.Command, args []string) {
 	indexfile := outTree.join("index.html")
 	outfile, err := os.Create(indexfile)
 	if err != nil {
-		log.Fatalf("Unable to open the output file \"%s\": %s", indexfile, outfile)
+		log.Fatalf("Unable to open the output file \"%s\": %s", indexfile, err.Error())
 	}
 	defer outfile.Close()
 
 	// Funtion map
 	fmap := template.FuncMap{
 		"makeImages": im.MakeImages,
-		"makeScrubNails": func(chunk frameset.Chunk) []ScrubNail {
+		"makeScrubNails": func(chunk movieset.Chunk) []ScrubNail {
 			return makeScrubNails(im, chunk)
 		},
-		"frameSetName": func(set frameset.FrameSet) string {
+		"frameSetName": func(set movieset.FrameSet) string {
 			return filepath.Base(set.Source)
 		},
 	}

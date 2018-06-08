@@ -15,7 +15,7 @@ type MovRecord struct {
 	StartTime time.Time     `json:",omitempty"`
 	Duration  time.Duration `json:",omitempty"`
 
-	lqt *lazyquicktime.LazyQuicktime `json:"-"`
+	lqt *lazyquicktime.LazyQuicktime
 }
 
 // MovRecordFromLqt creates a MovRecord given a LazyQuicktime

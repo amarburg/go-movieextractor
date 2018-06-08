@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/amarburg/go-frameset"
+	"github.com/amarburg/go-movieset"
 	"image"
 	"image/draw"
 	"image/png"
@@ -12,8 +12,8 @@ import (
 )
 
 type ScrubNail struct {
-	Images        []Images
-	NumFrames     int
+	Images                           []Images
+	NumFrames                        int
 	ScrubnailPath, RelaScrubnailPath string
 }
 
@@ -33,13 +33,12 @@ func maxInt(a, b int) int {
 	return b
 }
 
-
-func makeScrubNails(im *ImageMaker, chunk frameset.Chunk) []ScrubNail {
+func makeScrubNails(im *ImageMaker, chunk movieset.Chunk) []ScrubNail {
 	// Make configurable later
 	framesPerThumb := int(30 * 60)
 	framesPerImage := int(30 * 5)
 
-	numThumbs := int( (chunk.End-chunk.Start) / uint64(framesPerThumb) )
+	numThumbs := int((chunk.End - chunk.Start) / uint64(framesPerThumb))
 
 	scrubnails := make([]ScrubNail, numThumbs)
 
@@ -137,7 +136,7 @@ func GenerateSpriteSheet(images []Images) draw.Image {
 		sprites = append(sprites, newSprite)
 
 		sheetWidth += bounds.Dx()
-    sheetHeight = maxInt( sheetHeight, bounds.Dy() )
+		sheetHeight = maxInt(sheetHeight, bounds.Dy())
 
 	}
 

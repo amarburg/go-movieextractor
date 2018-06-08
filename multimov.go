@@ -3,15 +3,15 @@ package movieset
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/amarburg/go-lazyfs"
+	"github.com/amarburg/go-lazyquicktime"
 	"hash/fnv"
+	"image"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
-	"image"
 	"time"
-	"log"
-	"github.com/amarburg/go-lazyfs"
-	 "github.com/amarburg/go-lazyquicktime"
 )
 
 // MultiMovVersion is the semantic version string for the current MultiMov
@@ -51,11 +51,12 @@ func NewMultiMov() MultiMov {
 // an error if unsuccessful
 func LoadMultiMov(path string) (*MultiMov, error) {
 	file, err := os.Open(path)
-	defer file.Close()
 
 	if err != nil {
 		return nil, err
 	}
+
+	defer file.Close()
 
 	decoder := json.NewDecoder(file)
 	mm := new(MultiMov)
@@ -87,7 +88,12 @@ func LoadMultiMov(path string) (*MultiMov, error) {
 //== Functions for adding/removing movies from MultiMov
 func (mm *MultiMov) addHash(mov MovRecord) MovHash {
 	h := fnv.New32()
-	io.WriteString(h, mov.ShortName)
+	_, err := io.WriteString(h, mov.ShortName)
+
+	if err != nil {
+		return 0
+	}
+
 	crc := MovHash(h.Sum32())
 
 	mm.Movies[crc] = mov
@@ -131,7 +137,7 @@ func (mm MultiMov) NumFrames() uint64 {
 func (mm MultiMov) Offset(frame uint64) (MovHash, uint64, error) {
 	for _, h := range mm.Sequence {
 		mov, has := mm.Movies[h.Hash]
-		if has == false {
+		if !has {
 			return 0, 0, fmt.Errorf("Error loading hash from movie table")
 		}
 
@@ -147,7 +153,7 @@ func (mm MultiMov) Offset(frame uint64) (MovHash, uint64, error) {
 func (mm MultiMov) MovPath(hash MovHash) string {
 	mov, has := mm.Movies[hash]
 
-	if has == false {
+	if !has {
 		return ""
 	}
 

@@ -1,12 +1,12 @@
 package movieset
 
 import (
-	"image"
-	"time"
 	"fmt"
 	"github.com/amarburg/go-lazyfs"
 	"github.com/amarburg/go-lazyquicktime"
+	"image"
 	"path/filepath"
+	"time"
 )
 
 // MovieExtractor is the abstract interface to a quicktime movie.
@@ -16,8 +16,6 @@ type MovieExtractor interface {
 	ExtractFrame(frame uint64) (image.Image, error)
 	//ExtractFramePerf(frame uint64) (image.Image, LQTPerformance, error)
 }
-
-
 
 func OpenMovieExtractor(path string) (MovieExtractor, error) {
 

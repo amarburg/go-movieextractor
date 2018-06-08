@@ -9,7 +9,7 @@ pipeline:
     commands:
       - go get -t -v
       - golangci-lint run
-      - go build
+      - go build . ./cmd/...
       - go test
 
 

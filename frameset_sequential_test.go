@@ -5,8 +5,6 @@ import (
 	"testing"
 )
 
-
-
 func TestFrameSetSequentialGoodJson(t *testing.T) {
 
 	set, err := LoadFrameSet(frameset_testfiles.GoodFrameSetJson)

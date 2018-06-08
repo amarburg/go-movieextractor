@@ -1,7 +1,8 @@
 package main
 
 import (
-	"github.com/amarburg/go-lazyquicktime"
+	//"github.com/amarburg/go-lazyquicktime"
+	"github.com/amarburg/go-movieset"
 	"github.com/bamiaux/rez"
 	"image"
 	"image/png"
@@ -10,7 +11,7 @@ import (
 )
 
 type ImageMaker struct {
-	mm    lazyquicktime.MovieExtractor
+	mm    movieset.MovieExtractor
 	scale float32
 	ot    OutTree
 }
@@ -21,7 +22,7 @@ type Images struct {
 	FrameNum                   uint64
 }
 
-func NewImageMaker(mm lazyquicktime.MovieExtractor, ot OutTree) *ImageMaker {
+func NewImageMaker(mm movieset.MovieExtractor, ot OutTree) *ImageMaker {
 	return &ImageMaker{
 		mm:    mm,
 		scale: 0.25,
@@ -67,19 +68,19 @@ func (im *ImageMaker) MakeImages(frameNum uint64) Images {
 			img, err = png.Decode(imgFile)
 			if err != nil {
 				log.Printf("Error decoding png %s: %s", imgFilename, err)
-			 }
+			}
 			imgFile.Close()
 		}
 
 		if img != nil {
-		thumb := image.NewRGBA(image.Rect(0, 0,
-			int(float32(img.Bounds().Dx())*im.scale),
-			int(float32(img.Bounds().Dy())*im.scale)))
-		rez.Convert(thumb, img, rez.NewBicubicFilter())
-		thumbFile, _ := os.Create(thumbFilename)
-		png.Encode(thumbFile, thumb)
-		thumbFile.Close()
-}
+			thumb := image.NewRGBA(image.Rect(0, 0,
+				int(float32(img.Bounds().Dx())*im.scale),
+				int(float32(img.Bounds().Dy())*im.scale)))
+			rez.Convert(thumb, img, rez.NewBicubicFilter())
+			thumbFile, _ := os.Create(thumbFilename)
+			png.Encode(thumbFile, thumb)
+			thumbFile.Close()
+		}
 	}
 
 	return images

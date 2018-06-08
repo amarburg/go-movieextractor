@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/amarburg/go-lazyfs"
 	"github.com/amarburg/go-lazyquicktime"
-	"github.com/amarburg/go-multimov"
+	"github.com/amarburg/go-movieset"
 	"os"
 	"path/filepath"
 )
@@ -30,7 +30,7 @@ func main() {
 	fmt.Printf("Basedir:  %s\n", basedir)
 
 	// Create the Multimov
-	mm := multimov.NewMultiMov()
+	mm := movieset.NewMultiMov()
 
 	for _, pathStr := range flag.Args() {
 
@@ -39,18 +39,18 @@ func main() {
 		for _, path := range matches {
 
 			if _, err := os.Stat(path); os.IsNotExist(err) {
-				fmt.Println("Path \"%s\" doesn't exist", path)
+				fmt.Printf("Path \"%s\" doesn't exist\n", path)
 				continue
 			}
 
 			lqt, err := makeLazyQuicktime(path)
 
 			if err != nil {
-				fmt.Printf("Error making lazyquicktime: %s", err)
+				fmt.Println("Error making lazyquicktime:", err)
 				continue
 			}
 
-			mr := multimov.MovRecordFromLqt(lqt)
+			mr := movieset.MovRecordFromLqt(lqt)
 
 			// Rebase to the specified basedir
 			mr.Relapath, _ = filepath.Rel(basedir, path)

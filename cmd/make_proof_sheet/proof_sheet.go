@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/amarburg/go-multimov"
+	"github.com/amarburg/go-movieset"
 	"github.com/bamiaux/rez"
 	"github.com/spf13/cobra"
 	"html/template"
@@ -44,7 +44,7 @@ func runProofSheet(cmd *cobra.Command, args []string) {
 		log.Fatalf("Must specify a multimov .json file on the command line")
 	}
 
-	mm, err := multimov.LoadMultiMov(source)
+	mm, err := movieset.LoadMultiMov(source)
 	if err != nil {
 		log.Fatalf("Unable to load MultiMov from \"%s\": %s", source, err)
 	}
@@ -89,7 +89,7 @@ func runProofSheet(cmd *cobra.Command, args []string) {
 	indexfile := filepath.Join(outpath, "index.html")
 	outfile, err := os.Create(indexfile)
 	if err != nil {
-		log.Fatalf("Unable to open the output file \"%s\": %s", indexfile, outfile)
+		log.Fatalf("Unable to open the output file \"%s\": %s", indexfile, err.Error())
 	}
 	defer outfile.Close()
 
@@ -102,7 +102,7 @@ func runProofSheet(cmd *cobra.Command, args []string) {
 		imgcell  = `{{define "ImageCell"}}<a href="{{ imageName .}}"><img src="{{ thumbnailName .}}"></a><br>{{.}}{{end}}`
 	)
 
-	var funcs = template.FuncMap{"framesIn": func(seq multimov.SequenceElement) []uint64 {
+	var funcs = template.FuncMap{"framesIn": func(seq movieset.SequenceElement) []uint64 {
 		//log.Printf("%T %#v %d", hash, hash, count)
 		start := uint64(math.Trunc(float64(seq.FrameOffset)/float64(step))) * step
 		mov, _ := mm.Movies[seq.Hash]
@@ -121,7 +121,7 @@ func runProofSheet(cmd *cobra.Command, args []string) {
 		}
 		return out
 	},
-		"movName": func(seq multimov.SequenceElement) string {
+		"movName": func(seq movieset.SequenceElement) string {
 			return mm.Movies[seq.Hash].ShortName
 		},
 		"thumbnailName": func(frameNum uint64) string {

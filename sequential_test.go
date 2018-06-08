@@ -3,15 +3,15 @@ package movieset
 import (
 	"github.com/amarburg/go-lazyfs-testfiles/frameset"
 	"github.com/amarburg/go-lazyfs-testfiles/multimov"
-	"testing"
 	"io"
+	"testing"
 )
 
 func goodSequentialCheck(t *testing.T, source Sequential) {
 	frames := 0
 	done := false
 
-	for done == false {
+	for !done {
 		_, _, err := source.Next()
 
 		switch err {
@@ -30,10 +30,9 @@ func goodSequentialCheck(t *testing.T, source Sequential) {
 
 	if frames != frameset_testfiles.GoodFrameSetJsonFrames {
 		t.Errorf("Didn't get as many frames as I expected %d, rather than %d",
-							frameset_testfiles.GoodFrameSetJsonFrames, frames)
+			frameset_testfiles.GoodFrameSetJsonFrames, frames)
 	}
 }
-
 
 func TestSequentialGoodJson(t *testing.T) {
 

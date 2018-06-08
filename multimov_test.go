@@ -158,11 +158,20 @@ func TestAppendMovie(t *testing.T) {
 	expectNumFrames(t, &mm, 2*uint64(lazyfs_testfiles.TestMovNumFrames))
 
 	file, err := os.Create("temp.json")
+
+	if err != nil {
+		t.Fatalf("Failed to create temporary file \"temp.json\"")
+	}
+
 	defer file.Close()
 
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
-	encoder.Encode(mm)
+	err = encoder.Encode(mm)
+
+	if err != nil {
+		t.Fatalf("Encoder failed")
+	}
 
 }
 

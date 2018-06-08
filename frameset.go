@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sort"
 	"path/filepath"
+	"sort"
 )
 
 type FrameSet struct {
@@ -49,16 +49,15 @@ func (f NotAFrameSetError) Error() string {
 	return "Not a frameset"
 }
 
-// LoadMultiMov reads a MultiMov from the a path to a given JSON file.
-// Returns a pointer to a new MultiMov if successful, or nil and
-// an error if unsuccessful
+// LoadFrameSet reads a FrameSet...
 func LoadFrameSet(path string) (*FrameSet, error) {
 	file, err := os.Open(path)
-	defer file.Close()
 
 	if err != nil {
 		return nil, err
 	}
+
+	defer file.Close()
 
 	decoder := json.NewDecoder(file)
 	set := new(FrameSet)
@@ -114,30 +113,28 @@ func (p UInt64Slice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
 func (fs *FrameSet) ChunkNames() []string {
 	var names []string
-	for _,chunk := range fs.Chunks {
+	for _, chunk := range fs.Chunks {
 		names = append(names, chunk.Name)
 	}
 	return names
 }
 
 func (fs *FrameSet) MovFromChunk(name string) (VirtualMov, error) {
-	for _,chunk := range fs.Chunks {
+	for _, chunk := range fs.Chunks {
 		if chunk.Name == name {
 
-			ex,err := OpenMovieExtractor( fs.Source )
+			ex, err := OpenMovieExtractor(fs.Source)
 
 			if err != nil {
-					return VirtualMov{}, err
+				return VirtualMov{}, err
 			}
 
 			return CreateVirtualMov(ex, chunk.Start, chunk.End)
 		}
 	}
 
-		return VirtualMov{}, fmt.Errorf("Couldn't find chunk \"%s\"", name )
+	return VirtualMov{}, fmt.Errorf("Couldn't find chunk \"%s\"", name)
 }
-
-
 
 func (set FrameSet) MovieExtractor() (MovieExtractor, error) {
 	// Create the source

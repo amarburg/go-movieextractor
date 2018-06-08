@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/amarburg/go-lazyquicktime"
+	"github.com/amarburg/go-movieset"
 	"github.com/bamiaux/rez"
 	"image"
 	"image/png"
@@ -10,7 +10,7 @@ import (
 )
 
 type ImageMaker struct {
-	mm    lazyquicktime.MovieExtractor
+	mm    movieset.MovieExtractor
 	scale float32
 	ot    OutTree
 }
@@ -20,7 +20,7 @@ type Images struct {
 	FrameNum           uint64
 }
 
-func NewImageMaker(mm lazyquicktime.MovieExtractor, ot OutTree) *ImageMaker {
+func NewImageMaker(mm movieset.MovieExtractor, ot OutTree) *ImageMaker {
 	return &ImageMaker{
 		mm:    mm,
 		scale: 0.1,
