@@ -4,19 +4,14 @@ workspace:
 
 pipeline:
   build:
-    image: amarburg/golang-ffmpeg:latest
-    pull: true
-    commands:
-      - go get -t -v
-      - go build
-      - go test
-
-  lint:
     image: amarburg/golang-ffmpeg:latest-ci
     pull: true
     commands:
-      - ls /usr/local/bin
+      - go get -t -v
       - golangci-lint run
+      - go build
+      - go test
+
 
   slack:
     image: plugins/slack
