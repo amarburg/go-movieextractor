@@ -4,7 +4,7 @@ workspace:
 
 pipeline:
   build:
-    image: amarburg/golang-ffmpeg:latest-ci
+    image: amarburg/golang-ffmpeg:latest
     pull: true
     commands:
       - go get -t -v
@@ -15,8 +15,6 @@ pipeline:
     image: amarburg/golang-ffmpeg:latest-ci
     pull: true
     commands:
-      - echo $GOPATH
-      - ls $GOPATH
       - golangci-lint run
 
   slack:
