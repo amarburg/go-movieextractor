@@ -10,6 +10,11 @@ pipeline:
       - go build
       - go test
 
+  lint:
+    image: amarburg/golang-ffmpeg:latest-ci
+    commands:
+      - golangci-lint run
+
   slack:
     image: plugins/slack
     secrets: [ slack_webhook ]
