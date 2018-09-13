@@ -35,7 +35,7 @@ func (vm VirtualMov) Duration() time.Duration {
 }
 
 func (vm VirtualMov) ExtractFrame(frame uint64) (image.Image, error) {
-	vframe := frame - vm.Offset
+	vframe := frame + vm.Offset
 	if vframe >= vm.Length {
 		return nil, fmt.Errorf("Frame %d is beyond virtual length %d", vframe, vm.Length)
 	}
