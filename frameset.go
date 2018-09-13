@@ -121,9 +121,10 @@ func (fs *FrameSet) ChunkNames() []string {
 
 func (fs *FrameSet) MovFromChunk(name string) (VirtualMov, error) {
 	for _, chunk := range fs.Chunks {
+
 		if chunk.Name == name {
 
-			ex, err := OpenMovieExtractor(fs.Source)
+			ex, err := fs.MovieExtractor()
 
 			if err != nil {
 				return VirtualMov{}, err
