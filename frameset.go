@@ -142,7 +142,7 @@ func (set FrameSet) MovieExtractor() (MovieExtractor, error) {
 	source := os.ExpandEnv(set.Source)
 
 	// If path is relative, evaluate it relative to the input file...
-	if !filepath.IsAbs(set.Source) {
+	if !filepath.IsAbs(source) {
 		if len(set.filepath) == 0 {
 			return nil, fmt.Errorf("Source path in frameset is relative, but don't know filepath for frameset")
 		}
