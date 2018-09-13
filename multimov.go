@@ -8,7 +8,6 @@ import (
 	"hash/fnv"
 	"image"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -198,8 +197,6 @@ func (mm MultiMov) ExtractFrame(frame uint64) (image.Image, error) {
 		if _, err := os.Stat(movFile); os.IsNotExist(err) {
 			return nil, err
 		}
-
-		log.Printf("Opening movie file: %s", movFile)
 
 		fs, err := lazyfs.OpenLocalFile(movFile)
 		if err != nil {
