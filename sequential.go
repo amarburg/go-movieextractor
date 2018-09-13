@@ -4,7 +4,8 @@ import (
 	"image"
 )
 
-// Interface
+// A Sequential is a generic one-function interface which provides a
+// sequence of images.
 type Sequential interface {
 	Next() (image.Image, uint64, error)
 	//FrameNum() (uint64)
@@ -20,7 +21,7 @@ func OpenSequential(path string) (Sequential, error) {
 		return MakeFrameSetSequential(set)
 	}
 
-	if _, ok := err.(NotAFrameSetError); !ok {
+	if _, wasFrameSetError := err.(NotAFrameSetError); !wasFrameSetError {
 		return nil, err
 	}
 
